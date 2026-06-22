@@ -802,6 +802,17 @@
 <p class="p1"><span class="Apple-converted-space">        </span>const AVATARS_LIST = ['🔮', '✨', '🌙', '🌌', '🃏', '🕯️'];</p>
 <p class="p1"><span class="Apple-converted-space">        </span>const itemsPerPage = 6;</p>
 <p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// --- Helper for timezone-offset local ISO Date Strings (Thailands GMT+7) ---</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function getThailandLocalDate(dateObj = new Date()) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const tzoffset = 7 * 60 * 60 * 1000; // Thailand is UTC+7</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const localDate = new Date(dateObj.getTime() + tzoffset);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>return localDate.toISOString();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>function getThailandLocalDateOnly(dateObj = new Date()) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>return getThailandLocalDate(dateObj).split('T')[0];</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
 <p class="p1"><span class="Apple-converted-space">        </span>// --- FIREBASE ENVIRONMENT CONFIGURATION ---</p>
 <p class="p1"><span class="Apple-converted-space">        </span>const appId = typeof __app_id !== 'undefined' ? __app_id : 'tarot-queue-default-app';</p>
 <p class="p1"><span class="Apple-converted-space">        </span>const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {</p>
@@ -1017,6 +1028,7 @@
 <p class="p1"><span class="Apple-converted-space">            </span>}</p>
 <p class="p1"><span class="Apple-converted-space">        </span>}</p>
 <p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Toggle Theme</p>
 <p class="p1"><span class="Apple-converted-space">        </span>function toggleTheme() {</p>
 <p class="p1"><span class="Apple-converted-space">            </span>state.darkMode = !state.darkMode;</p>
 <p class="p1"><span class="Apple-converted-space">            </span>initializeTheme();</p>
@@ -1483,8 +1495,8 @@
 <p class="p1"><span class="Apple-converted-space">                    </span>questions: state.queueForm.questions.trim(),</p>
 <p class="p1"><span class="Apple-converted-space">                    </span>notes: state.queueForm.notes ? state.queueForm.notes.trim() : '',</p>
 <p class="p1"><span class="Apple-converted-space">                    </span>createdAt: state.editingQueueId<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                        </span>? (state.queues.find(item =&gt; item.id === state.editingQueueId)?.createdAt || new Date().toISOString())<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                        </span>: new Date().toISOString()</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>? (state.queues.find(item =&gt; item.id === state.editingQueueId)?.createdAt || getThailandLocalDate())<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                        </span>: getThailandLocalDate()</p>
 <p class="p1"><span class="Apple-converted-space">                </span>};</p>
 <p class="p2"><br></p>
 <p class="p1"><span class="Apple-converted-space">                </span>if (state.editingQueueId) {</p>
@@ -1518,12 +1530,13 @@
 <p class="p1"><span class="Apple-converted-space">        </span>}</p>
 <p class="p2"><br></p>
 <p class="p1"><span class="Apple-converted-space">        </span>function resetQueueFormState() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const tomorrow = new Date(Date.now() + 86400000);</p>
 <p class="p1"><span class="Apple-converted-space">            </span>state.queueForm = {</p>
 <p class="p1"><span class="Apple-converted-space">                </span>id: '', queueCode: '', nickname: '', fullname: '', age: '', gender: 'หญิง',</p>
 <p class="p1"><span class="Apple-converted-space">                </span>contactChannel: 'LINE', contactAccount: '', profileLink: '', tellerId: state.tellers[0]?.id || '',</p>
 <p class="p1"><span class="Apple-converted-space">                </span>packageId: state.packages[0]?.id || '', questionCount: 1, totalPrice: state.packages[0]?.price || 0,</p>
 <p class="p1"><span class="Apple-converted-space">                </span>paymentStatus: 'ยังไม่ชำระ', paidAmount: 0,<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>estDate: new Date(Date.now() + 86400000).toISOString().split('T')[0],<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>estDate: getThailandLocalDateOnly(tomorrow),<span class="Apple-converted-space"> </span></p>
 <p class="p1"><span class="Apple-converted-space">                </span>estTime: '20:00', jobStatus: 'รอชำระเงิน', questions: '', notes: ''</p>
 <p class="p1"><span class="Apple-converted-space">            </span>};</p>
 <p class="p1"><span class="Apple-converted-space">            </span>localStorage.removeItem('tarot_queue_form_draft');</p>
@@ -2087,7 +2100,7 @@
 <p class="p1"><span class="Apple-converted-space">                </span>return true;</p>
 <p class="p1"><span class="Apple-converted-space">            </span>});</p>
 <p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>const todayStr = new Date().toISOString().split('T')[0];</p>
+<p class="p1"><span class="Apple-converted-space">            </span>const todayStr = getThailandLocalDateOnly(); // GMT+7 Date String</p>
 <p class="p1"><span class="Apple-converted-space">            </span>const thisMonthStr = todayStr.substring(0, 7);</p>
 <p class="p2"><br></p>
 <p class="p1"><span class="Apple-converted-space">            </span>let pendingPayment = 0, pendingPrediction = 0, predicting = 0, delivered = 0;</p>
@@ -2103,8 +2116,13 @@
 <p class="p1"><span class="Apple-converted-space">                </span>if (q.jobStatus === 'ส่งคำทำนายแล้ว') delivered++;</p>
 <p class="p2"><br></p>
 <p class="p1"><span class="Apple-converted-space">                </span>const paid = parseFloat(q.paidAmount) || 0;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (q.createdAt &amp;&amp; q.createdAt.startsWith(todayStr)) revToday += paid;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (q.createdAt &amp;&amp; q.createdAt.startsWith(thisMonthStr)) revMonth += paid;</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// convert UTC database createdAt back to Thailand timezone to compare safely</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (q.createdAt) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const localCreatedAt = getThailandLocalDateOnly(new Date(q.createdAt));</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (localCreatedAt === todayStr) revToday += paid;</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (localCreatedAt.startsWith(thisMonthStr)) revMonth += paid;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>}</p>
 <p class="p2"><br></p>
 <p class="p1"><span class="Apple-converted-space">                </span>if (q.packageId) pkgMap[q.packageId] = (pkgMap[q.packageId] || 0) + 1;</p>
 <p class="p1"><span class="Apple-converted-space">                </span>if (q.fullname || q.nickname) {</p>
@@ -2134,13 +2152,13 @@
 <p class="p1"><span class="Apple-converted-space">            </span>const last5Days = Array.from({ length: 5 }, (_, i) =&gt; {</p>
 <p class="p1"><span class="Apple-converted-space">                </span>const d = new Date();</p>
 <p class="p1"><span class="Apple-converted-space">                </span>d.setDate(d.getDate() - (4 - i));</p>
-<p class="p1"><span class="Apple-converted-space">                </span>return d.toISOString().split('T')[0];</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return getThailandLocalDateOnly(d);</p>
 <p class="p1"><span class="Apple-converted-space">            </span>});</p>
 <p class="p2"><br></p>
 <p class="p1"><span class="Apple-converted-space">            </span>const thaiMonths = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];</p>
 <p class="p1"><span class="Apple-converted-space">            </span>const chartData = last5Days.map(dateStr =&gt; {</p>
 <p class="p1"><span class="Apple-converted-space">                </span>const dayTotal = filtered</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>.filter(q =&gt; q.createdAt &amp;&amp; q.createdAt.startsWith(dateStr))</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>.filter(q =&gt; q.createdAt &amp;&amp; getThailandLocalDateOnly(new Date(q.createdAt)) === dateStr)</p>
 <p class="p1"><span class="Apple-converted-space">                    </span>.reduce((sum, q) =&gt; sum + (parseFloat(q.paidAmount) || 0), 0);</p>
 <p class="p1"><span class="Apple-converted-space">                </span>const parts = dateStr.split('-');</p>
 <p class="p1"><span class="Apple-converted-space">                </span>const dayLabel = `${parseInt(parts[2])} ${thaiMonths[parseInt(parts[1]) - 1]}`;</p>
@@ -2336,15 +2354,25 @@
 <p class="p1"><span class="Apple-converted-space">                    </span>state.queueForm = JSON.parse(draft);</p>
 <p class="p1"><span class="Apple-converted-space">                </span>} else {</p>
 <p class="p1"><span class="Apple-converted-space">                    </span>// Blank setup (tomorrow by default)</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>const tomorrow = new Date(Date.now() + 86400000);</p>
 <p class="p1"><span class="Apple-converted-space">                    </span>state.queueForm = {</p>
 <p class="p1"><span class="Apple-converted-space">                        </span>id: '', queueCode: '', nickname: '', fullname: '', age: '', gender: 'หญิง',</p>
 <p class="p1"><span class="Apple-converted-space">                        </span>contactChannel: 'LINE', contactAccount: '', profileLink: '',</p>
 <p class="p1"><span class="Apple-converted-space">                        </span>tellerId: state.tellers[0].id, packageId: state.packages[0].id,</p>
 <p class="p1"><span class="Apple-converted-space">                        </span>questionCount: 1, totalPrice: state.packages[0].price, paymentStatus: 'ยังไม่ชำระ',</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>paidAmount: 0, estDate: new Date(Date.now() + 86400000).toISOString().split('T')[0],</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>paidAmount: 0, estDate: getThailandLocalDateOnly(tomorrow),</p>
 <p class="p1"><span class="Apple-converted-space">                        </span>estTime: '20:00', jobStatus: 'รอชำระเงิน', questions: '', notes: ''</p>
 <p class="p1"><span class="Apple-converted-space">                    </span>};</p>
 <p class="p1"><span class="Apple-converted-space">                </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Fill empty fields if newly fetched data from Firestore hasn't synced to draft yet</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (!state.queueForm.tellerId &amp;&amp; state.tellers.length &gt; 0) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>state.queueForm.tellerId = state.tellers[0].id;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (!state.queueForm.packageId &amp;&amp; state.packages.length &gt; 0) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>state.queueForm.packageId = state.packages[0].id;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>state.queueForm.totalPrice = state.packages[0].price;</p>
 <p class="p1"><span class="Apple-converted-space">            </span>}</p>
 <p class="p2"><span class="Apple-converted-space">            </span></p>
 <p class="p1"><span class="Apple-converted-space">            </span>syncFormInputsFromDrafts();</p>
