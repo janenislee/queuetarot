@@ -1,0 +1,2413 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2818
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 <!DOCTYPE html>\
+<html lang="th" class="h-full">\
+<head>\
+    <meta charset="UTF-8">\
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">\
+    <title>TarotQueue - \uc0\u3619 \u3632 \u3610 \u3610 \u3610 \u3619 \u3636 \u3627 \u3634 \u3619 \u3592 \u3633 \u3604 \u3585 \u3634 \u3619 \u3588 \u3636 \u3623 \u3621 \u3641 \u3585 \u3604 \u3623 \u3591 \u3649 \u3617 \u3656 \u3627 \u3617 \u3629 \u3629 \u3633 \u3592 \u3593 \u3619 \u3636 \u3618 \u3632 </title>\
+    \
+    <!-- Tailwind CSS CDN -->\
+    <script src="https://cdn.tailwindcss.com"></script>\
+    <script>\
+        tailwind.config = \{\
+            darkMode: 'class',\
+            theme: \{\
+                extend: \{\
+                    fontFamily: \{\
+                        sans: ['Inter', 'Noto Sans Thai', 'sans-serif'],\
+                    \},\
+                    colors: \{\
+                        brand: \{\
+                            50: '#f5f3ff',\
+                            100: '#ede9fe',\
+                            200: '#ddd6fe',\
+                            300: '#c4b5fd',\
+                            400: '#a78bfa',\
+                            500: '#8b5cf6',\
+                            600: '#7c3aed',\
+                            700: '#6d28d9',\
+                            800: '#5b21b6',\
+                            900: '#4c1d95',\
+                        \}\
+                    \}\
+                \}\
+            \}\
+        \}\
+    </script>\
+\
+    <!-- FontAwesome for Premium Icons -->\
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">\
+    \
+    <!-- Google Fonts: Inter & Noto Sans Thai -->\
+    <link rel="preconnect" href="https://fonts.googleapis.com">\
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+Thai:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">\
+\
+    <!-- Custom Micro-Styles -->\
+    <style>\
+        /* Custom slide-in and fade-in animations for dynamic alerts */\
+        @keyframes slideIn \{\
+            from \{ transform: translateY(-1rem); opacity: 0; \}\
+            to \{ transform: translateY(0); opacity: 1; \}\
+        \}\
+        @keyframes scaleUp \{\
+            from \{ transform: scale(0.95); opacity: 0; \}\
+            to \{ transform: scale(1); opacity: 1; \}\
+        \}\
+        .animate-slide-in \{\
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;\
+        \}\
+        .animate-scale-up \{\
+            animation: scaleUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;\
+        \}\
+        ::-webkit-scrollbar \{\
+            width: 6px;\
+            height: 6px;\
+        \}\
+        ::-webkit-scrollbar-track \{\
+            background: transparent;\
+        \}\
+        .dark ::-webkit-scrollbar-thumb \{\
+            background: #3f3f46;\
+            border-radius: 999px;\
+        \}\
+        ::-webkit-scrollbar-thumb \{\
+            background: #e4e4e7;\
+            border-radius: 999px;\
+        \}\
+    </style>\
+</head>\
+<body class="h-full bg-purple-50/50 dark:bg-zinc-950 text-zinc-800 dark:text-zinc-100 transition-colors duration-200 antialiased font-sans flex flex-col">\
+\
+    <!-- Toast Notifications Container -->\
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 max-w-sm w-full px-4 sm:px-0 pointer-events-none"></div>\
+\
+    <!-- Custom Confirm Dialog Backdrop -->\
+    <div id="confirm-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">\
+        <div class="w-full max-w-md p-6 rounded-3xl shadow-xl border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 animate-scale-up">\
+            <div class="flex items-center gap-3 text-amber-500 mb-4">\
+                <div class="w-10 h-10 rounded-full bg-amber-50 dark:bg-amber-950/30 flex items-center justify-center text-lg">\
+                    <i class="fa-solid fa-triangle-exclamation"></i>\
+                </div>\
+                <h3 id="confirm-title" class="text-lg font-bold text-zinc-900 dark:text-zinc-50">\uc0\u3618 \u3639 \u3609 \u3618 \u3633 \u3609 \u3585 \u3634 \u3619 \u3607 \u3635 \u3619 \u3634 \u3618 \u3585 \u3634 \u3619 </h3>\
+            </div>\
+            <p id="confirm-message" class="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">\uc0\u3588 \u3640 \u3603 \u3649 \u3609 \u3656 \u3651 \u3592 \u3627 \u3619 \u3639 \u3629 \u3652 \u3617 \u3656 \u3623 \u3656 \u3634 \u3605 \u3657 \u3629 \u3591 \u3585 \u3634 \u3619 \u3621 \u3610 \u3586 \u3657 \u3629 \u3617 \u3641 \u3621 \u3609 \u3637 \u3657 \u3629 \u3629 \u3585 \u3592 \u3634 \u3585 \u3619 \u3632 \u3610 \u3610 \u3629 \u3618 \u3656 \u3634 \u3591 \u3606 \u3634 \u3623 \u3619 ?</p>\
+            <div class="mt-6 flex justify-end gap-3">\
+                <button id="confirm-cancel-btn" class="px-4 py-2 rounded-xl text-xs font-semibold bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 transition-all">\
+                    \uc0\u3618 \u3585 \u3648 \u3621 \u3636 \u3585 \
+                </button>\
+                <button id="confirm-ok-btn" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold shadow-lg shadow-rose-600/15 transition-all">\
+                    \uc0\u3618 \u3639 \u3609 \u3618 \u3633 \u3609 \
+                </button>\
+            </div>\
+        </div>\
+    </div>\
+\
+    <!-- APP BAR HEADER -->\
+    <header class="sticky top-0 z-40 border-b border-purple-100 dark:border-zinc-800 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-md">\
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">\
+            \
+            <!-- Logo Section -->\
+            <div class="flex items-center gap-3">\
+                <div class="p-2.5 bg-gradient-to-tr from-purple-600 to-indigo-500 text-white rounded-2xl shadow-md shadow-purple-500/20">\
+                    <span class="text-xl">\uc0\u55357 \u56622 </span>\
+                </div>\
+                <div>\
+                    <h1 class="text-base font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-indigo-600 dark:from-purple-300 dark:to-indigo-300">\
+                        TarotQueue\
+                    </h1>\
+                    <p class="text-[10px] text-zinc-400 dark:text-zinc-500 font-medium">\uc0\u3619 \u3632 \u3610 \u3610 \u3588 \u3636 \u3623 \u3649 \u3617 \u3656 \u3627 \u3617 \u3629 \u3629 \u3633 \u3592 \u3593 \u3619 \u3636 \u3618 \u3632 </p>\
+                </div>\
+            </div>\
+\
+            <!-- Header Controller Tools -->\
+            <div class="flex items-center gap-2">\
+                \
+                <!-- Dark Mode Toggler -->\
+                <button id="dark-mode-toggle" class="p-2.5 rounded-xl border border-purple-100 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 text-purple-700 dark:text-amber-300 hover:bg-purple-100/40 dark:hover:bg-zinc-700/80 transition-all" title="\uc0\u3626 \u3621 \u3633 \u3610 \u3650 \u3627 \u3617 \u3604 \u3627 \u3609 \u3657 \u3634 \u3592 \u3629 ">\
+                    <i class="fa-solid fa-moon"></i>\
+                </button>\
+\
+                <!-- Role Toggler Panel -->\
+                <div class="flex p-1 rounded-xl border border-purple-100 dark:border-zinc-800 bg-purple-100/30 dark:bg-zinc-950 text-[11px] font-semibold">\
+                    <button id="role-admin-btn" class="px-3 py-1.5 rounded-lg transition-all bg-purple-600 text-white shadow-sm">\
+                        Admin\
+                    </button>\
+                    <button id="role-teller-btn" class="px-3 py-1.5 rounded-lg transition-all text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-100">\
+                        \uc0\u3649 \u3617 \u3656 \u3627 \u3617 \u3629 \
+                    </button>\
+                </div>\
+\
+                <!-- Active Fortune Teller Selector (Hidden in Admin role) -->\
+                <select id="header-teller-selector" class="p-1.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-purple-500 hidden"></select>\
+            </div>\
+        </div>\
+\
+        <!-- NAVIGATION BAR (TABS) -->\
+        <nav class="flex border-t border-purple-50 dark:border-zinc-800/60 max-w-7xl mx-auto px-2 bg-white dark:bg-zinc-900">\
+            <button data-tab="dashboard" class="nav-tab-btn flex-1 py-3 flex flex-col items-center gap-1 transition-all text-center border-b-2 border-purple-600 text-purple-600 dark:text-purple-400">\
+                <span class="text-base"><i class="fa-solid fa-chart-pie"></i></span>\
+                <span class="text-[10px] font-bold tracking-tight">\uc0\u3616 \u3634 \u3614 \u3619 \u3623 \u3617 </span>\
+            </button>\
+            <button data-tab="queues" class="nav-tab-btn flex-1 py-3 flex flex-col items-center gap-1 transition-all text-center border-b-2 border-transparent text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300">\
+                <span class="text-base"><i class="fa-solid fa-users-rectangle"></i></span>\
+                <span class="text-[10px] font-bold tracking-tight">\uc0\u3592 \u3633 \u3604 \u3585 \u3634 \u3619 \u3588 \u3636 \u3623 </span>\
+            </button>\
+            <button data-tab="tellers" class="nav-tab-btn admin-only flex-1 py-3 flex flex-col items-center gap-1 transition-all text-center border-b-2 border-transparent text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300">\
+                <span class="text-base"><i class="fa-solid fa-wand-magic-sparkles"></i></span>\
+                <span class="text-[10px] font-bold tracking-tight">\uc0\u3649 \u3617 \u3656 \u3627 \u3617 \u3629 </span>\
+            </button>\
+            <button data-tab="packages" class="nav-tab-btn admin-only flex-1 py-3 flex flex-col items-center gap-1 transition-all text-center border-b-2 border-transparent text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300">\
+                <span class="text-base"><i class="fa-solid fa-tags"></i></span>\
+                <span class="text-[10px] font-bold tracking-tight">\uc0\u3649 \u3614 \u3655 \u3585 \u3648 \u3585 \u3592 </span>\
+            </button>\
+            <button data-tab="analytics" class="nav-tab-btn flex-1 py-3 flex flex-col items-center gap-1 transition-all text-center border-b-2 border-transparent text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300">\
+                <span class="text-base"><i class="fa-solid fa-chart-line"></i></span>\
+                <span class="text-[10px] font-bold tracking-tight">\uc0\u3626 \u3606 \u3636 \u3605 \u3636 </span>\
+            </button>\
+        </nav>\
+    </header>\
+\
+    <!-- MAIN CONTAINER -->\
+    <main class="flex-1 max-w-7xl mx-auto px-4 py-6 pb-24 w-full">\
+        \
+        <!-- Breadcrumb & Status Info -->\
+        <div class="mb-4 flex items-center justify-between text-xs">\
+            <div class="flex items-center gap-1.5 text-zinc-400 dark:text-zinc-500">\
+                <span>\uc0\u3627 \u3609 \u3657 \u3634 \u3627 \u3621 \u3633 \u3585 </span>\
+                <span>/</span>\
+                <span id="breadcrumb-current-page" class="text-purple-600 dark:text-purple-400 font-semibold">\uc0\u3616 \u3634 \u3614 \u3619 \u3623 \u3617 </span>\
+            </div>\
+            <div id="role-badge-info" class="text-[11px] text-zinc-400 dark:text-zinc-500 font-medium">\
+                \uc0\u9889  \u3626 \u3636 \u3607 \u3608 \u3636 \u3660 \u3649 \u3629 \u3604 \u3617 \u3636 \u3609 \u3619 \u3632 \u3610 \u3610 \u3627 \u3621 \u3633 \u3585 \
+            </div>\
+        </div>\
+\
+        <!-- PAGE 1: DASHBOARD -->\
+        <div id="dashboard-page" class="page-container space-y-6">\
+            \
+            <!-- Welcome banner with Actions -->\
+            <div class="relative overflow-hidden p-6 rounded-3xl border border-transparent bg-gradient-to-br from-purple-600 to-indigo-700 text-white dark:from-zinc-900 dark:to-zinc-950 dark:border-zinc-800">\
+                <div class="relative z-10">\
+                    <span class="text-xs font-bold tracking-wider opacity-85 uppercase">\uc0\u3618 \u3636 \u3609 \u3604 \u3637 \u3605 \u3657 \u3629 \u3609 \u3619 \u3633 \u3610 \u3626 \u3641 \u3656 \u3619 \u3632 \u3610 \u3610 </span>\
+                    <h2 id="dashboard-welcome-title" class="text-2xl font-black mt-1">\uc0\u3619 \u3632 \u3610 \u3610 \u3612 \u3641 \u3657 \u3604 \u3641 \u3649 \u3621 \u3627 \u3621 \u3633 \u3591 \u3610 \u3657 \u3634 \u3609  TarotQueue</h2>\
+                    <p class="text-xs mt-1.5 max-w-lg text-purple-100 dark:text-zinc-400">\
+                        \uc0\u3610 \u3619 \u3636 \u3627 \u3634 \u3619 \u3592 \u3633 \u3604 \u3585 \u3634 \u3619 \u3605 \u3619 \u3623 \u3592 \u3626 \u3629 \u3610 \u3588 \u3636 \u3623 \u3621 \u3641 \u3585 \u3604 \u3623 \u3591  \u3619 \u3632 \u3610 \u3610 \u3588 \u3635 \u3607 \u3635 \u3609 \u3634 \u3618  \u3649 \u3621 \u3632 \u3611 \u3619 \u3632 \u3648 \u3617 \u3636 \u3609 \u3619 \u3634 \u3618 \u3619 \u3633 \u3610 \u3649 \u3617 \u3656 \u3627 \u3617 \u3629 \u3607 \u3640 \u3585 \u3588 \u3609 \u3652 \u3604 \u3657 \u3629 \u3618 \u3656 \u3634 \u3591 \u3648 \u3611 \u3655 \u3609 \u3619 \u3632 \u3648 \u3610 \u3637 \u3618 \u3610 \u3649 \u3621 \u3632 \u3648 \u3611 \u3655 \u3609 \u3617 \u3639 \u3629 \u3629 \u3634 \u3594 \u3637 \u3614 \
+                    </p>\
+                    <div class="mt-4 flex flex-wrap gap-2">\
+                        <button id="dash-add-queue-btn" class="px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 bg-white text-purple-700 hover:bg-purple-50 dark:bg-purple-600 dark:text-white dark:hover:bg-purple-700 shadow-md transition-all active:scale-95">\
+                            <i class="fa-solid fa-plus"></i> \uc0\u3648 \u3614 \u3636 \u3656 \u3617 \u3588 \u3636 \u3623 \u3621 \u3641 \u3585 \u3604 \u3623 \u3591 \u3651 \u3627 \u3617 \u3656 \
+                        </button>\
+                        <button id="dash-restore-draft-btn" class="px-3 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-xl text-xs font-bold shadow-md transition-all active:scale-95 hidden">\
+                            <i class="fa-solid fa-floppy-disk"></i> \uc0\u3650 \u3627 \u3621 \u3604 \u3649 \u3610 \u3610 \u3619 \u3656 \u3634 \u3591 \u3588 \u3636 \u3623 \u3621 \u3656 \u3634 \u3626 \u3640 \u3604 \
+                        </button>\
+                    </div>\
+                </div>\
+                <div class="absolute right-0 bottom-0 opacity-10 text-[150px] pointer-events-none select-none translate-y-8 translate-x-4">\uc0\u55357 \u56622 </div>\
+            </div>\
+\
+            <!-- 6 Summary Cards Indicators -->\
+            <div>\
+                <h3 class="text-sm font-bold mb-3 flex items-center gap-2">\
+                    <span>\uc0\u55357 \u56524 </span> \u3604 \u3633 \u3594 \u3609 \u3637 \u3588 \u3636 \u3623  & \u3619 \u3634 \u3618 \u3619 \u3633 \u3610 \u3626 \u3632 \u3626 \u3617 \
+                </h3>\
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3.5" id="summary-cards-grid">\
+                    <!-- Cards will be populated dynamically -->\
+                </div>\
+            </div>\
+\
+            <!-- Critical and Delayed Alerts Panel -->\
+            <div id="dashboard-alerts-section" class="p-5 rounded-3xl border border-red-100 bg-red-50/20 dark:border-zinc-800 dark:bg-zinc-900/40 hidden">\
+                <h3 class="text-sm font-bold text-rose-600 dark:text-rose-400 mb-3 flex items-center gap-1.5">\
+                    <i class="fa-solid fa-bell"></i> \uc0\u3588 \u3636 \u3623 \u3607 \u3637 \u3656 \u3605 \u3657 \u3629 \u3591 \u3604 \u3635 \u3648 \u3609 \u3636 \u3609 \u3585 \u3634 \u3619 \u3604 \u3656 \u3623 \u3609 \u3649 \u3621 \u3632 \u3611 \u3633 \u3597 \u3627 \u3634 \u3588 \u3657 \u3634 \u3591 \u3626 \u3656 \u3591 \
+                </h3>\
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="dashboard-alerts-grid">\
+                    <!-- Alerts will be inserted dynamically -->\
+                </div>\
+            </div>\
+\
+            <!-- Grid Layout for Lists -->\
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">\
+                <!-- Left: Active prediction queues -->\
+                <div class="lg:col-span-8 space-y-4">\
+                    <div class="flex items-center justify-between">\
+                        <h3 class="text-sm font-bold flex items-center gap-1.5">\
+                            <span>\uc0\u8987 </span> \u3588 \u3636 \u3623 \u3619 \u3632 \u3627 \u3623 \u3656 \u3634 \u3591 \u3604 \u3635 \u3648 \u3609 \u3636 \u3609 \u3585 \u3634 \u3619 \u3607 \u3635 \u3609 \u3634 \u3618  (\u3621 \u3656 \u3634 \u3626 \u3640 \u3604  4 \u3588 \u3636 \u3623 )\
+                        </h3>\
+                        <button id="view-all-queues-shortcut" class="text-xs text-purple-600 dark:text-purple-400 font-bold hover:underline">\
+                            \uc0\u3604 \u3641 \u3588 \u3636 \u3623 \u3607 \u3633 \u3657 \u3591 \u3627 \u3617 \u3604  \u8594 \
+                        </button>\
+                    </div>\
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="dashboard-active-queues-grid">\
+                        <!-- Dynamic items -->\
+                    </div>\
+                </div>\
+\
+                <!-- Right: Stats & Popular -->\
+                <div class="lg:col-span-4 space-y-6">\
+                    <!-- Popular Packages -->\
+                    <div class="p-5 rounded-3xl border border-purple-100 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 shadow-sm">\
+                        <h4 class="text-xs font-bold tracking-wider text-zinc-400 dark:text-zinc-500 uppercase mb-3">\uc0\u55356 \u57335 \u65039  \u3649 \u3614 \u3655 \u3585 \u3648 \u3585 \u3592 \u3618 \u3629 \u3604 \u3609 \u3636 \u3618 \u3617 \u3626 \u3641 \u3591 \u3626 \u3640 \u3604 </h4>\
+                        <div class="space-y-3" id="dash-popular-packages-list"></div>\
+                    </div>\
+\
+                    <!-- Regular Customers -->\
+                    <div class="p-5 rounded-3xl border border-purple-100 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 shadow-sm">\
+                        <h4 class="text-xs font-bold tracking-wider text-zinc-400 dark:text-zinc-500 uppercase mb-3">\uc0\u55357 \u56470  \u3621 \u3641 \u3585 \u3604 \u3623 \u3591 \u3586 \u3634 \u3611 \u3619 \u3632 \u3592 \u3635 \u3588 \u3609 \u3626 \u3635 \u3588 \u3633 \u3597 </h4>\
+                        <div class="space-y-3" id="dash-regular-customers-list"></div>\
+                    </div>\
+                </div>\
+            </div>\
+        </div>\
+\
+        <!-- PAGE 2: QUEUE MANAGEMENT -->\
+        <div id="queues-page" class="page-container space-y-6 hidden">\
+            \
+            <!-- Search & Filters Container -->\
+            <div class="p-5 rounded-3xl border border-purple-100 dark:border-zinc-800 bg-white dark:bg-zinc-900/80 shadow-sm">\
+                <!-- Search input -->\
+                <div class="relative">\
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-zinc-400 text-sm">\
+                        <i class="fa-solid fa-magnifying-glass"></i>\
+                    </span>\
+                    <input type="text" id="queue-search" placeholder="\uc0\u3588 \u3657 \u3609 \u3627 \u3634 \u3604 \u3657 \u3623 \u3618 \u3594 \u3639 \u3656 \u3629 \u3648 \u3621 \u3656 \u3609 , \u3594 \u3639 \u3656 \u3629 \u3592 \u3619 \u3636 \u3591 , \u3610 \u3633 \u3597 \u3594 \u3637 \u3605 \u3636 \u3604 \u3605 \u3656 \u3629 , \u3627 \u3619 \u3639 \u3629 \u3619 \u3627 \u3633 \u3626 \u3588 \u3636 \u3623  \u3648 \u3594 \u3656 \u3609  NT-000001..." class="w-full pl-9 pr-4 py-2.5 rounded-2xl text-xs focus:outline-none focus:ring-2 focus:ring-purple-600 bg-purple-50/50 border border-purple-100 text-zinc-800 dark:bg-zinc-950 dark:border-zinc-800 dark:text-white dark:focus:ring-purple-500">\
+                </div>\
+\
+                <!-- Dropdown filters grid -->\
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mt-4">\
+                    <!-- Filter Status -->\
+                    <div>\
+                        <label class="text-[10px] font-bold text-zinc-400 block mb-1">\uc0\u3626 \u3606 \u3634 \u3609 \u3632 \u3591 \u3634 \u3609 </label>\
+                        <select id="filter-status" class="w-full p-2.5 rounded-xl text-xs focus:outline-none border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-700 dark:text-zinc-300">\
+                            <option value="all">\uc0\u3607 \u3633 \u3657 \u3591 \u3627 \u3617 \u3604 </option>\
+                            <option value="\uc0\u3619 \u3629 \u3594 \u3635 \u3619 \u3632 \u3648 \u3591 \u3636 \u3609 ">\u3619 \u3629 \u3594 \u3635 \u3619 \u3632 \u3648 \u3591 \u3636 \u3609 </option>\
+                            <option value="\uc0\u3619 \u3629 \u3588 \u3635 \u3607 \u3635 \u3609 \u3634 \u3618 ">\u3619 \u3629 \u3588 \u3635 \u3607 \u3635 \u3609 \u3634 \u3618 </option>\
+                            <option value="\uc0\u3585 \u3635 \u3621 \u3633 \u3591 \u3607 \u3635 \u3609 \u3634 \u3618 ">\u3585 \u3635 \u3621 \u3633 \u3591 \u3607 \u3635 \u3609 \u3634 \u3618 </option>\
+                            <option value="\uc0\u3619 \u3629 \u3626 \u3656 \u3591 \u3588 \u3635 \u3607 \u3635 \u3609 \u3634 \u3618 ">\u3619 \u3629 \u3626 \u3656 \u3591 \u3588 \u3635 \u3607 \u3635 \u3609 \u3634 \u3618 </option>\
+                            <option value="\uc0\u3626 \u3656 \u3591 \u3588 \u3635 \u3607 \u3635 \u3609 \u3634 \u3618 \u3649 \u3621 \u3657 \u3623 ">\u3626 \u3656 \u3591 \u3588 \u3635 \u3607 \u3635 \u3609 \u3634 \u3618 \u3649 \u3621 \u3657 \u3623 </option>\
+                            <option value="\uc0\u3618 \u3585 \u3648 \u3621 \u3636 \u3585 ">\u3618 \u3585 \u3648 \u3621 \u3636 \u3585 </option>\
+                        </select>\
+                    </div>\
+\
+                    <!-- Filter Payment -->\
+                    <div>\
+                        <label class="text-[10px] font-bold text-zinc-400 block mb-1">\uc0\u3626 \u3606 \u3634 \u3609 \u3632 \u3594 \u3635 \u3619 \u3632 \u3648 \u3591 \u3636 \u3609 </label>\
+                        <select id="filter-payment" class="w-full p-2.5 rounded-xl text-xs focus:outline-none border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-700 dark:text-zinc-300">\
+                            <option value="all">\uc0\u3607 \u3633 \u3657 \u3591 \u3627 \u3617 \u3604 </option>\
+                            <option value="\uc0\u3618 \u3633 \u3591 \u3652 \u3617 \u3656 \u3594 \u3635 \u3619 \u3632 ">\u3618 \u3633 \u3591 \u3652 \u3617 \u3656 \u3594 \u3635 \u3619 \u3632 </option>\
+                            <option value="\uc0\u3617 \u3633 \u3604 \u3592 \u3635 \u3649 \u3621 \u3657 \u3623 ">\u3617 \u3633 \u3604 \u3592 \u3635 \u3649 \u3621 \u3657 \u3623 </option>\
+                            <option value="\uc0\u3594 \u3635 \u3619 \u3632 \u3588 \u3619 \u3610 \u3649 \u3621 \u3657 \u3623 ">\u3594 \u3635 \u3619 \u3632 \u3588 \u3619 \u3610 \u3649 \u3621 \u3657 \u3623 </option>\
+                            <option value="\uc0\u3588 \u3639 \u3609 \u3648 \u3591 \u3636 \u3609 \u3649 \u3621 \u3657 \u3623 ">\u3588 \u3639 \u3609 \u3648 \u3591 \u3636 \u3609 \u3649 \u3621 \u3657 \u3623 </option>\
+                        </select>\
+                    </div>\
+\
+                    <!-- Filter Teller (Visible only to Admin) -->\
+                    <div id="filter-teller-container">\
+                        <label class="text-[10px] font-bold text-zinc-400 block mb-1">\uc0\u3648 \u3621 \u3639 \u3629 \u3585 \u3649 \u3617 \u3656 \u3627 \u3617 \u3629 </label>\
+                        <select id="filter-teller" class="w-full p-2.5 rounded-xl text-xs focus:outline-none border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-700 dark:text-zinc-300">\
+                            <option value="all">\uc0\u3649 \u3617 \u3656 \u3627 \u3617 \u3629 \u3607 \u3640 \u3585 \u3588 \u3609 </option>\
+                        </select>\
+                    </div>\
+\
+                    <!-- Filter Date -->\
+                    <div>\
+                        <label class="text-[10px] font-bold text-zinc-400 block mb-1">\uc0\u3623 \u3633 \u3609 \u3607 \u3637 \u3656 \u3609 \u3633 \u3604 \u3626 \u3656 \u3591 \u3607 \u3635 \u3609 \u3634 \u3618 </label>\
+                        <input type="date" id="filter-date" class="w-full p-2 rounded-xl text-xs focus:outline-none border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-700 dark:text-zinc-300">\
+                    </div>\
+                </div>\
+\
+                <div id="clear-filters-btn-container" class="mt-3 flex justify-end hidden">\
+                    <button id="clear-filters-btn" class="text-xs text-rose-600 dark:text-rose-400 font-bold hover:underline">\
+                        \uc0\u3621 \u3657 \u3634 \u3591 \u3605 \u3633 \u3623 \u3585 \u3619 \u3629 \u3591 \u3607 \u3633 \u3657 \u3591 \u3627 \u3617 \u3604 \
+                    </button>\
+                </div>\
+            </div>\
+\
+            <!-- Header Title and Add Buttons -->\
+            <div class="flex items-center justify-between">\
+                <h3 class="text-sm font-bold flex items-center gap-1.5">\
+                    <span>\uc0\u55357 \u56523 </span> \u3619 \u3634 \u3618 \u3585 \u3634 \u3619 \u3588 \u3636 \u3623 \u3621 \u3641 \u3585 \u3604 \u3623 \u3591 \u3607 \u3633 \u3657 \u3591 \u3627 \u3617 \u3604  (<span id="total-queues-count">0</span> \u3588 \u3636 \u3623 )\
+                </h3>\
+                <button id="page-add-queue-btn" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold shadow-md shadow-purple-600/10 transition-all active:scale-95">\
+                    \uc0\u10133  \u3648 \u3614 \u3636 \u3656 \u3617 \u3588 \u3636 \u3623 \u3621 \u3641 \u3585 \u3604 \u3623 \u3591 \
+                </button>\
+            </div>\
+\
+            <!-- Empty State element -->\
+            <div id="queues-empty-state" class="p-16 rounded-3xl border border-purple-100 bg-white dark:border-zinc-800 dark:bg-zinc-900/40 text-center hidden">\
+                <span class="text-5xl block">\uc0\u55357 \u56650 \u65039 </span>\
+                <h4 class="text-sm font-black mt-4">\uc0\u3652 \u3617 \u3656 \u3614 \u3610 \u3586 \u3657 \u3629 \u3617 \u3641 \u3621 \u3588 \u3636 \u3623 \u3621 \u3641 \u3585 \u3604 \u3623 \u3591 </h4>\
+                <p class="text-xs text-zinc-400 dark:text-zinc-500 mt-1 max-w-sm mx-auto">\
+                    \uc0\u3652 \u3617 \u3656 \u3614 \u3610 \u3586 \u3657 \u3629 \u3617 \u3641 \u3621 \u3607 \u3637 \u3656 \u3605 \u3619 \u3591 \u3585 \u3633 \u3610 \u3648 \u3591 \u3639 \u3656 \u3629 \u3609 \u3652 \u3586 \u3585 \u3634 \u3619 \u3588 \u3657 \u3609 \u3627 \u3634 \u3627 \u3619 \u3639 \u3629 \u3586 \u3603 \u3632 \u3609 \u3637 \u3657 \u3652 \u3617 \u3656 \u3617 \u3637 \u3585 \u3634 \u3619 \u3610 \u3633 \u3609 \u3607 \u3638 \u3585 \u3588 \u3636 \u3623 \u3651 \u3609 \u3619 \u3632 \u3610 \u3610 \
+                </p>\
+                <button id="empty-state-add-btn" class="mt-4 px-4 py-2 bg-purple-600 text-white rounded-xl text-xs font-bold hover:bg-purple-700 shadow-md">\
+                    \uc0\u3626 \u3619 \u3657 \u3634 \u3591 \u3588 \u3636 \u3623 \u3649 \u3619 \u3585 \u3586 \u3629 \u3591 \u3588 \u3640 \u3603 \
+                </button>\
+            </div>\
+\
+            <!-- Cards Grid -->\
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="queues-cards-grid"></div>\
+\
+            <!-- Pagination block -->\
+            <div class="mt-6 flex items-center justify-between" id="queues-pagination-container">\
+                <span id="pagination-status-text" class="text-xs text-zinc-400 dark:text-zinc-500">\
+                    \uc0\u3649 \u3626 \u3604 \u3591 \u3588 \u3636 \u3623 \u3607 \u3637 \u3656  1 - 6 \u3592 \u3634 \u3585 \u3607 \u3633 \u3657 \u3591 \u3627 \u3617 \u3604  0 \u3588 \u3636 \u3623 \
+                </span>\
+\
+                <div class="flex items-center gap-1.5">\
+                    <button id="pagination-prev-btn" class="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 text-xs font-semibold disabled:opacity-40 bg-white dark:bg-zinc-900 transition-all">\
+                        \uc0\u3585 \u3656 \u3629 \u3609 \u3627 \u3609 \u3657 \u3634 \
+                    </button>\
+                    <span id="pagination-page-indicator" class="text-xs font-bold text-purple-600 dark:text-purple-400 px-2">\
+                        1 / 1\
+                    </span>\
+                    <button id="pagination-next-btn" class="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 text-xs font-semibold disabled:opacity-40 bg-white dark:bg-zinc-900 transition-all">\
+                        \uc0\u3606 \u3633 \u3604 \u3652 \u3611 \
+                    </button>\
+                </div>\
+            </div>\
+        </div>\
+\
+        <!-- PAGE 3: TELLER MANAGEMENT (Admin only) -->\
+        <div id="tellers-page" class="page-container admin-only space-y-6 hidden">\
+            <div class="flex justify-between items-center">\
+                <div>\
+                    <h3 class="text-base font-bold">\uc0\u55357 \u56622  \u3619 \u3634 \u3618 \u3594 \u3639 \u3656 \u3629 \u3649 \u3621 \u3632 \u3626 \u3606 \u3634 \u3609 \u3632 \u3585 \u3634 \u3619 \u3648 \u3611 \u3636 \u3604 \u3619 \u3633 \u3610 \u3591 \u3634 \u3609 \u3586 \u3629 \u3591 \u3649 \u3617 \u3656 \u3627 \u3617 \u3629 </h3>\
+                    <p class="text-xs text-zinc-400 dark:text-zinc-500 mt-1">\uc0\u3592 \u3633 \u3604 \u3585 \u3634 \u3619 \u3586 \u3657 \u3629 \u3617 \u3641 \u3621  \u3594 \u3656 \u3629 \u3591 \u3607 \u3634 \u3591 \u3605 \u3636 \u3604 \u3605 \u3656 \u3629  \u3649 \u3621 \u3632 \u3585 \u3634 \u3619 \u3619 \u3633 \u3610 \u3588 \u3636 \u3623 \u3586 \u3629 \u3591 \u3649 \u3617 \u3656 \u3627 \u3617 \u3629 \u3649 \u3605 \u3656 \u3621 \u3632 \u3588 \u3609 </p>\
+                </div>\
+                <button id="add-teller-btn" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold shadow-md transition-all">\
+                    \uc0\u10133  \u3648 \u3614 \u3636 \u3656 \u3617 \u3649 \u3617 \u3656 \u3627 \u3617 \u3629 \u3614 \u3618 \u3634 \u3585 \u3619 \u3603 \u3660 \
+                </button>\
+            </div>\
+\
+            <!-- Empty State for Tellers -->\
+            <div id="tellers-empty-state" class="p-16 rounded-3xl border border-purple-100 bg-white dark:border-zinc-800 dark:bg-zinc-900/40 text-center hidden">\
+                <span class="text-5xl block">\uc0\u55357 \u56622 </span>\
+                <h4 class="text-sm font-black mt-4">\uc0\u3652 \u3617 \u3656 \u3617 \u3637 \u3586 \u3657 \u3629 \u3617 \u3641 \u3621 \u3649 \u3617 \u3656 \u3627 \u3617 \u3629 \u3614 \u3618 \u3634 \u3585 \u3619 \u3603 \u3660 </h4>\
+                <p class="text-xs text-zinc-400 dark:text-zinc-500 mt-1 max-w-sm mx-auto">\uc0\u3585 \u3619 \u3640 \u3603 \u3634 \u3585 \u3604 \u3648 \u3614 \u3636 \u3656 \u3617 \u3586 \u3657 \u3629 \u3617 \u3641 \u3621 \u3649 \u3617 \u3656 \u3627 \u3617 \u3629 \u3614 \u3618 \u3634 \u3585 \u3619 \u3603 \u3660 \u3648 \u3586 \u3657 \u3634 \u3626 \u3641 \u3656 \u3619 \u3632 \u3610 \u3610 \u3648 \u3614 \u3639 \u3656 \u3629 \u3651 \u3594 \u3657 \u3619 \u3633 \u3610 \u3592 \u3633 \u3604 \u3588 \u3636 \u3623 </p>\
+            </div>\
+\
+            <!-- Tellers grid -->\
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="tellers-cards-grid"></div>\
+        </div>\
+\
+        <!-- PAGE 4: PACKAGE PRICING (Admin only) -->\
+        <div id="packages-page" class="page-container admin-only space-y-6 hidden">\
+            <div class="flex justify-between items-center">\
+                <div>\
+                    <h3 class="text-base font-bold">\uc0\u55356 \u57335 \u65039  \u3605 \u3634 \u3619 \u3634 \u3591 \u3629 \u3633 \u3605 \u3619 \u3634 \u3588 \u3656 \u3634 \u3610 \u3619 \u3636 \u3585 \u3634 \u3619 \u3649 \u3621 \u3632 \u3649 \u3614 \u3655 \u3585 \u3648 \u3585 \u3592 </h3>\
+                    <p class="text-xs text-zinc-400 dark:text-zinc-500 mt-1">\uc0\u3605 \u3633 \u3657 \u3591 \u3588 \u3656 \u3634 \u3619 \u3634 \u3588 \u3634 \u3649 \u3614 \u3655 \u3585 \u3648 \u3585 \u3592 \u3604 \u3641 \u3604 \u3623 \u3591 \u3648 \u3614 \u3639 \u3656 \u3629 \u3651 \u3594 \u3657 \u3611 \u3619 \u3632 \u3648 \u3617 \u3636 \u3609 \u3649 \u3621 \u3632 \u3588 \u3635 \u3609 \u3623 \u3603 \u3648 \u3591 \u3636 \u3609 \u3629 \u3633 \u3605 \u3650 \u3609 \u3617 \u3633 \u3605 \u3636 \u3648 \u3617 \u3639 \u3656 \u3629 \u3607 \u3635 \u3588 \u3636 \u3623 </p>\
+                </div>\
+                <button id="add-package-btn" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold shadow-md transition-all">\
+                    \uc0\u10133  \u3648 \u3614 \u3636 \u3656 \u3617 \u3619 \u3634 \u3588 \u3634 \u3649 \u3614 \u3655 \u3585 \u3648 \u3585 \u3592 \
+                </button>\
+            </div>\
+\
+            <!-- Empty State for Packages -->\
+            <div id="packages-empty-state" class="p-16 rounded-3xl border border-purple-100 bg-white dark:border-zinc-800 dark:bg-zinc-900/40 text-center hidden">\
+                <span class="text-5xl block">\uc0\u55356 \u57335 \u65039 </span>\
+                <h4 class="text-sm font-black mt-4">\uc0\u3652 \u3617 \u3656 \u3617 \u3637 \u3586 \u3657 \u3629 \u3617 \u3641 \u3621 \u3649 \u3614 \u3655 \u3585 \u3648 \u3585 \u3592 \u3619 \u3634 \u3588 \u3634 </h4>\
+                <p class="text-xs text-zinc-400 dark:text-zinc-500 mt-1 max-w-sm mx-auto">\uc0\u3585 \u3619 \u3640 \u3603 \u3634 \u3585 \u3604 \u3648 \u3614 \u3636 \u3656 \u3617 \u3605 \u3634 \u3619 \u3634 \u3591 \u3648 \u3619 \u3605 \u3649 \u3614 \u3655 \u3585 \u3648 \u3585 \u3592 \u3619 \u3634 \u3588 \u3634 \u3648 \u3614 \u3639 \u3656 \u3629 \u3629 \u3635 \u3609 \u3623 \u3618 \u3588 \u3623 \u3634 \u3617 \u3626 \u3632 \u3604 \u3623 \u3585 \u3651 \u3609 \u3585 \u3634 \u3619 \u3588 \u3636 \u3604 \u3588 \u3635 \u3609 \u3623 \u3603 \u3648 \u3591 \u3636 \u3609 \u3592 \u3629 \u3591 \u3588 \u3636 \u3623 </p>\
+            </div>\
+\
+            <!-- Packages grid -->\
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5" id="packages-cards-grid"></div>\
+        </div>\
+\
+        <!-- PAGE 5: STATISTICS & ANALYTICS -->\
+        <div id="analytics-page" class="page-container space-y-6 hidden">\
+            <div class="flex items-center justify-between">\
+                <div>\
+                    <h3 class="text-base font-bold">\uc0\u55357 \u56520  \u3619 \u3634 \u3618 \u3591 \u3634 \u3609 \u3586 \u3657 \u3629 \u3617 \u3641 \u3621 \u3626 \u3606 \u3636 \u3605 \u3636 \u3649 \u3621 \u3632 \u3585 \u3634 \u3619 \u3648 \u3591 \u3636 \u3609 \u3648 \u3594 \u3636 \u3591 \u3621 \u3638 \u3585 </h3>\
+                    <p class="text-xs text-zinc-400 dark:text-zinc-500 mt-1">\uc0\u3623 \u3636 \u3648 \u3588 \u3619 \u3634 \u3632 \u3627 \u3660 \u3649 \u3609 \u3623 \u3650 \u3609 \u3657 \u3617 \u3618 \u3629 \u3604 \u3619 \u3634 \u3618 \u3652 \u3604 \u3657  \u3626 \u3633 \u3604 \u3626 \u3656 \u3623 \u3609 \u3586 \u3629 \u3591 \u3621 \u3641 \u3585 \u3588 \u3657 \u3634  \u3649 \u3621 \u3632 \u3594 \u3656 \u3629 \u3591 \u3607 \u3634 \u3591 \u3618 \u3629 \u3604 \u3609 \u3636 \u3618 \u3617 \u3648 \u3614 \u3639 \u3656 \u3629 \u3648 \u3614 \u3636 \u3656 \u3617 \u3611 \u3619 \u3632 \u3626 \u3636 \u3607 \u3608 \u3636 \u3616 \u3634 \u3614 \u3626 \u3641 \u3591 \u3626 \u3640 \u3604 </p>\
+                </div>\
+                <span class="text-xs font-semibold px-3 py-1 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-600 dark:text-purple-300">\
+                    \uc0\u3629 \u3633 \u3611 \u3648 \u3604 \u3605 \u3649 \u3610 \u3610 \u3648 \u3619 \u3637 \u3618 \u3621 \u3652 \u3607 \u3617 \u3660  \u55357 \u57314 \
+                </span>\
+            </div>\
+\
+            <!-- SVG HISTORICAL CHART -->\
+            <div class="p-6 rounded-3xl border border-purple-100 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 shadow-sm">\
+                <h4 class="text-xs font-bold tracking-wider text-zinc-400 dark:text-zinc-500 uppercase mb-4">\uc0\u55357 \u56522  \u3618 \u3629 \u3604 \u3619 \u3634 \u3618 \u3619 \u3633 \u3610 \u3649 \u3621 \u3632 \u3585 \u3634 \u3619 \u3607 \u3635 \u3588 \u3636 \u3623  5 \u3623 \u3633 \u3609 \u3607 \u3637 \u3656 \u3612 \u3656 \u3634 \u3609 \u3617 \u3634 </h4>\
+                \
+                <!-- Dynamic SVG Representation -->\
+                <div class="h-64 w-full flex items-end justify-between gap-4 pt-6 pb-2 px-4 border-b border-zinc-100 dark:border-zinc-800" id="analytics-chart-svg-container"></div>\
+\
+                <div class="mt-4 flex gap-4 text-xs text-zinc-400 dark:text-zinc-500">\
+                    <div class="flex items-center gap-1.5">\
+                        <span class="w-3 h-3 rounded-full bg-gradient-to-tr from-purple-500 to-indigo-500 inline-block"></span>\
+                        <span>\uc0\u3618 \u3629 \u3604 \u3594 \u3635 \u3619 \u3632 \u3649 \u3621 \u3657 \u3623 \u3592 \u3619 \u3636 \u3591  (\u3610 \u3634 \u3607 )</span>\
+                    </div>\
+                </div>\
+            </div>\
+\
+            <!-- Double Columns statistics -->\
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">\
+                <!-- Old vs New customer circular ratio -->\
+                <div class="p-6 rounded-3xl border border-purple-100 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 shadow-sm">\
+                    <h4 class="text-xs font-bold tracking-wider text-zinc-400 dark:text-zinc-500 uppercase mb-4">\uc0\u55357 \u56421  \u3626 \u3633 \u3604 \u3626 \u3656 \u3623 \u3609 \u3621 \u3641 \u3585 \u3588 \u3657 \u3634 \u3648 \u3585 \u3656 \u3634 -\u3651 \u3627 \u3617 \u3656 </h4>\
+                    <div class="flex items-center justify-around py-4">\
+                        <div class="relative w-32 h-32 rounded-full border-8 border-indigo-600 dark:border-indigo-500 flex items-center justify-center">\
+                            <div class="text-center">\
+                                <span id="stats-total-customers" class="text-xl font-black">0</span>\
+                                <p class="text-[9px] text-zinc-400 dark:text-zinc-500">\uc0\u3619 \u3634 \u3618 \u3594 \u3639 \u3656 \u3629 \u3607 \u3633 \u3657 \u3591 \u3627 \u3617 \u3604 </p>\
+                            </div>\
+                        </div>\
+\
+                        <div class="space-y-2 text-xs">\
+                            <div class="flex items-center gap-2">\
+                                <span class="w-3 h-3 rounded-full bg-indigo-600 dark:bg-indigo-500"></span>\
+                                <span>\uc0\u3621 \u3641 \u3585 \u3604 \u3623 \u3591 \u3651 \u3627 \u3617 \u3656 : <span id="stats-new-customers" class="font-bold">0 \u3588 \u3609 </span></span>\
+                            </div>\
+                            <div class="flex items-center gap-2">\
+                                <span class="w-3 h-3 rounded-full bg-purple-400"></span>\
+                                <span>\uc0\u3621 \u3641 \u3585 \u3604 \u3623 \u3591 \u3611 \u3619 \u3632 \u3592 \u3635 : <span id="stats-returning-customers" class="font-bold">0 \u3588 \u3609 </span></span>\
+                            </div>\
+                        </div>\
+                    </div>\
+                </div>\
+\
+                <!-- Contact Channels Progress list -->\
+                <div class="p-6 rounded-3xl border border-purple-100 dark:border-zinc-800 bg-white dark:bg-zinc-900/60 shadow-sm">\
+                    <h4 class="text-xs font-bold tracking-wider text-zinc-400 dark:text-zinc-500 uppercase mb-4">\uc0\u55357 \u56561  \u3594 \u3656 \u3629 \u3591 \u3607 \u3634 \u3591 \u3607 \u3637 \u3656 \u3621 \u3641 \u3585 \u3604 \u3623 \u3591 \u3651 \u3594 \u3657 \u3610 \u3619 \u3636 \u3585 \u3634 \u3619 \u3626 \u3641 \u3591 \u3626 \u3640 \u3604 </h4>\
+                    <div class="space-y-3" id="stats-channels-container"></div>\
+                </div>\
+            </div>\
+        </div>\
+\
+    </main>\
+\
+    <!-- MODAL overlays -->\
+\
+    <!-- 1. TELLER MODAL overlay -->\
+    <div id="teller-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">\
+        <div class="w-full max-w-lg p-6 rounded-3xl shadow-xl border border-purple-100 bg-white text-zinc-800 dark:bg-zinc-900 dark:border-zinc-800 dark:text-white animate-scale-up max-h-[90vh] overflow-y-auto">\
+            <div class="flex justify-between items-center pb-4 border-b border-zinc-100 dark:border-zinc-800 mb-4">\
+                <h3 id="teller-modal-title" class="text-base font-black">\uc0\u55357 \u56622  \u3648 \u3614 \u3636 \u3656 \u3617 \u3649 \u3617 \u3656 \u3627 \u3617 \u3629 \u3614 \u3618 \u3634 \u3585 \u3619 \u3603 \u3660 \u3588 \u3609 \u3651 \u3627 \u3617 \u3656 </h3>\
+                <button type="button" class="modal-close-btn text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200" data-modal="teller-modal">\
+                    <i class="fa-solid fa-xmark"></i>\
+                </button>\
+            </div>\
+\
+            <form id="teller-form" class="space-y-4 text-xs">\
+                <input type="hidden" id="teller-form-id">\
+                \
+                <div>\
+                    <label class="font-bold text-zinc-500 dark:text-zinc-400 block mb-1">\uc0\u3626 \u3633 \u3597 \u3621 \u3633 \u3585 \u3625 \u3603 \u3660 \u3611 \u3619 \u3632 \u3592 \u3635 \u3605 \u3633 \u3623 \u3649 \u3617 \u3656 \u3627 \u3617 \u3629  *</label>\
+                    <div class="flex gap-2" id="teller-avatar-grid">\
+                        <!-- Emoji buttons -->\
+                    </div>\
+                    <input type="hidden" id="teller-avatar-input" value="\uc0\u55357 \u56622 ">\
+                </div>\
+\
+                <div>\
+                    <label class="font-bold text-zinc-500 dark:text-zinc-400 block mb-1">\uc0\u3594 \u3639 \u3656 \u3629 \u3649 \u3617 \u3656 \u3627 \u3617 \u3629  *</label>\
+                    <input type="text" id="teller-name" placeholder="\uc0\u3585 \u3619 \u3629 \u3585 \u3594 \u3639 \u3656 \u3629 \u3648 \u3621 \u3656 \u3609 \u3649 \u3617 \u3656 \u3627 \u3617 \u3629  (\u3648 \u3594 \u3656 \u3609  \u3649 \u3617 \u3656 \u3627 \u3617 \u3629 \u3649 \u3614 \u3619 \u3623 \u3634 )" class="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-purple-500">\
+                    <p id="teller-name-error" class="text-[10px] text-rose-500 mt-1 hidden"></p>\
+                </div>\
+\
+                <div>\
+                    <label class="font-bold text-zinc-500 dark:text-zinc-400 block mb-1">\uc0\u3594 \u3639 \u3656 \u3629 \u3648 \u3614 \u3592  / \u3626 \u3635 \u3609 \u3633 \u3585 \u3614 \u3618 \u3634 \u3585 \u3619 \u3603 \u3660  *</label>\
+                    <input type="text" id="teller-page-name" placeholder="\uc0\u3585 \u3619 \u3629 \u3585 \u3594 \u3639 \u3656 \u3629 \u3648 \u3614 \u3592 \u3626 \u3635 \u3627 \u3619 \u3633 \u3610 \u3649 \u3592 \u3657 \u3591 \u3614 \u3636 \u3585 \u3633 \u3604 \u3621 \u3641 \u3585 \u3588 \u3657 \u3634 " class="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-purple-500">\
+                    <p id="teller-page-error" class="text-[10px] text-rose-500 mt-1 hidden"></p>\
+                </div>\
+\
+                <div>\
+                    <label class="font-bold text-zinc-500 dark:text-zinc-400 block mb-1">\uc0\u3648 \u3610 \u3629 \u3619 \u3660 \u3650 \u3607 \u3619 \u3624 \u3633 \u3614 \u3607 \u3660 \u3605 \u3636 \u3604 \u3605 \u3656 \u3629  *</label>\
+                    <input type="text" id="teller-tel" placeholder="\uc0\u3585 \u3619 \u3629 \u3585 \u3648 \u3610 \u3629 \u3619 \u3660 \u3650 \u3607 \u3619 \u3624 \u3633 \u3614 \u3607 \u3660 \u3586 \u3629 \u3591 \u3649 \u3617 \u3656 \u3627 \u3617 \u3629 " class="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-purple-500">\
+                    <p id="teller-tel-error" class="text-[10px] text-rose-500 mt-1 hidden"></p>\
+                </div>\
+\
+                <div>\
+                    <label class="font-bold text-zinc-500 dark:text-zinc-400 block mb-1">\uc0\u3619 \u3634 \u3618 \u3621 \u3632 \u3648 \u3629 \u3637 \u3618 \u3604 \u3594 \u3656 \u3629 \u3591 \u3607 \u3634 \u3591 \u3605 \u3636 \u3604 \u3605 \u3656 \u3629 \u3629 \u3639 \u3656 \u3609 \u3654 </label>\
+                    <input type="text" id="teller-contact" placeholder="\uc0\u3648 \u3594 \u3656 \u3609  LINE ID: @praewa, FB DM" class="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-purple-500">\
+                </div>\
+\
+                <div>\
+                    <label class="font-bold text-zinc-500 dark:text-zinc-400 block mb-1">\uc0\u3626 \u3606 \u3634 \u3609 \u3632 \u3648 \u3611 \u3636 \u3604 \u3619 \u3633 \u3610 \u3588 \u3636 \u3623 \u3591 \u3634 \u3609  *</label>\
+                    <select id="teller-status" class="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-purple-500">\
+                        <option value="open">\uc0\u55357 \u57314  \u3648 \u3611 \u3636 \u3604 \u3619 \u3633 \u3610 \u3591 \u3634 \u3609 \u3611 \u3585 \u3605 \u3636  (\u3648 \u3611 \u3636 \u3604 \u3592 \u3629 \u3591 \u3588 \u3636 \u3623 )</option>\
+                        <option value="closed">\uc0\u55357 \u56628  \u3611 \u3636 \u3604 \u3619 \u3633 \u3610 \u3591 \u3634 \u3609 \u3594 \u3633 \u3656 \u3623 \u3588 \u3619 \u3634 \u3623  (\u3588 \u3636 \u3623 \u3648 \u3605 \u3655 \u3617 /\u3614 \u3633 \u3585 \u3612 \u3656 \u3629 \u3609 )</option>\
+                    </select>\
+                </div>\
+\
+                <div class="pt-4 border-t border-zinc-100 dark:border-zinc-800 flex justify-end gap-3">\
+                    <button type="button" class="modal-close-btn px-4 py-2 rounded-xl font-bold bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300" data-modal="teller-modal">\uc0\u3618 \u3585 \u3648 \u3621 \u3636 \u3585 </button>\
+                    <button type="submit" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold shadow-md">\uc0\u3610 \u3633 \u3609 \u3607 \u3638 \u3585 \u3586 \u3657 \u3629 \u3617 \u3641 \u3621 </button>\
+                </div>\
+            </form>\
+        </div>\
+    </div>\
+\
+    <!-- 2. PACKAGE MODAL overlay -->\
+    <div id="package-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">\
+        <div class="w-full max-w-lg p-6 rounded-3xl shadow-xl border border-purple-100 bg-white text-zinc-800 dark:bg-zinc-900 dark:border-zinc-800 dark:text-white animate-scale-up max-h-[90vh] overflow-y-auto">\
+            <div class="flex justify-between items-center pb-4 border-b border-zinc-100 dark:border-zinc-800 mb-4">\
+                <h3 id="package-modal-title" class="text-base font-black">\uc0\u55356 \u57335 \u65039  \u3648 \u3614 \u3636 \u3656 \u3617 \u3649 \u3614 \u3655 \u3585 \u3648 \u3585 \u3592 \u3619 \u3634 \u3588 \u3634 \u3619 \u3633 \u3610 \u3588 \u3636 \u3623 </h3>\
+                <button type="button" class="modal-close-btn text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200" data-modal="package-modal">\
+                    <i class="fa-solid fa-xmark"></i>\
+                </button>\
+            </div>\
+\
+            <form id="package-form" class="space-y-4 text-xs">\
+                <input type="hidden" id="package-form-id">\
+\
+                <div>\
+                    <label class="font-bold text-zinc-500 dark:text-zinc-400 block mb-1">\uc0\u3594 \u3639 \u3656 \u3629 \u3649 \u3614 \u3655 \u3585 \u3648 \u3585 \u3592 \u3585 \u3634 \u3619 \u3614 \u3618 \u3634 \u3585 \u3619 \u3603 \u3660  *</label>\
+                    <input type="text" id="package-name" placeholder="\uc0\u3648 \u3594 \u3656 \u3609  1 \u3588 \u3635 \u3606 \u3634 \u3617  - 39 \u3610 \u3634 \u3607  \u3627 \u3619 \u3639 \u3629  \u3588 \u3623 \u3634 \u3617 \u3619 \u3633 \u3585 \u3588 \u3619 \u3610 \u3626 \u3641 \u3605 \u3619 " class="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-purple-500">\
+                    <p id="package-name-error" class="text-[10px] text-rose-500 mt-1 hidden"></p>\
+                </div>\
+\
+                <div>\
+                    <label class="font-bold text-zinc-500 dark:text-zinc-400 block mb-1">\uc0\u3627 \u3617 \u3623 \u3604 \u3627 \u3617 \u3641 \u3656 /\u3611 \u3619 \u3632 \u3648 \u3616 \u3607 \u3588 \u3635 \u3607 \u3635 \u3609 \u3634 \u3618  *</label>\
+                    <select id="package-type" class="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-purple-500">\
+                        <option value="\uc0\u3606 \u3634 \u3617 \u3648 \u3593 \u3614 \u3634 \u3632 \u3648 \u3619 \u3639 \u3656 \u3629 \u3591 ">\u3606 \u3634 \u3617 \u3648 \u3593 \u3614 \u3634 \u3632 \u3648 \u3619 \u3639 \u3656 \u3629 \u3591  (\u3619 \u3634 \u3618 \u3586 \u3657 \u3629 )</option>\
+                        <option value="\uc0\u3648 \u3593 \u3614 \u3634 \u3632 \u3607 \u3634 \u3591 ">\u3648 \u3593 \u3614 \u3634 \u3632 \u3607 \u3634 \u3591  (\u3588 \u3623 \u3634 \u3617 \u3619 \u3633 \u3585 , \u3585 \u3634 \u3619 \u3591 \u3634 \u3609 , \u3626 \u3640 \u3586 \u3616 \u3634 \u3614 )</option>\
+                        <option value="\uc0\u3616 \u3634 \u3614 \u3619 \u3623 \u3617 \u3619 \u3634 \u3618 \u3648 \u3604 \u3639 \u3629 \u3609 ">\u3616 \u3634 \u3614 \u3619 \u3623 \u3617 \u3619 \u3634 \u3618 \u3648 \u3604 \u3639 \u3629 \u3609  / \u3619 \u3634 \u3618 \u3611 \u3637 </option>\
+                        <option value="\uc0\u3614 \u3636 \u3648 \u3624 \u3625 ">\u3649 \u3614 \u3655 \u3585 \u3648 \u3585 \u3592 \u3614 \u3618 \u3634 \u3585 \u3619 \u3603 \u3660 \u3614 \u3636 \u3648 \u3624 \u3625  (\u3623 \u3636 \u3585 \u3620 \u3605 , \u3607 \u3634 \u3591 \u3629 \u3629 \u3585 )</option>\
+                    </select>\
+                </div>\
+\
+                <div>\
+                    <label class="font-bold text-zinc-500 dark:text-zinc-400 block mb-1">\uc0\u3619 \u3634 \u3588 \u3634 \u3588 \u3656 \u3634 \u3610 \u3619 \u3636 \u3585 \u3634 \u3619  (\u3610 \u3634 \u3607 ) *</label>\
+                    <input type="number" id="package-price" placeholder="\uc0\u3585 \u3619 \u3629 \u3585 \u3592 \u3635 \u3609 \u3623 \u3609 \u3648 \u3591 \u3636 \u3609 " class="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-purple-500">\
+                    <p id="package-price-error" class="text-[10px] text-rose-500 mt-1 hidden"></p>\
+                </div>\
+\
+                <div>\
+                    <label class="font-bold text-zinc-500 dark:text-zinc-400 block mb-1">\uc0\u3619 \u3634 \u3618 \u3621 \u3632 \u3648 \u3629 \u3637 \u3618 \u3604 \u3588 \u3640 \u3603 \u3626 \u3617 \u3610 \u3633 \u3605 \u3636 \u3610 \u3619 \u3636 \u3585 \u3634 \u3619  *</label>\
+                    <textarea id="package-detail" rows="3" placeholder="\uc0\u3648 \u3594 \u3656 \u3609  \u3606 \u3634 \u3617 \u3652 \u3604 \u3657  3 \u3588 \u3635 \u3606 \u3634 \u3617  \u3605 \u3629 \u3610 \u3612 \u3656 \u3634 \u3609 \u3652 \u3621 \u3609 \u3660  \u3627 \u3619 \u3639 \u3629 \u3623 \u3636 \u3648 \u3588 \u3619 \u3634 \u3632 \u3627 \u3660 \u3649 \u3610 \u3610 \u3621 \u3632 \u3648 \u3629 \u3637 \u3618 \u3604 \u3618 \u3636 \u3610 " class="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-purple-500"></textarea>\
+                </div>\
+\
+                <div class="pt-4 border-t border-zinc-100 dark:border-zinc-800 flex justify-end gap-3">\
+                    <button type="button" class="modal-close-btn px-4 py-2 rounded-xl font-bold bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300" data-modal="package-modal">\uc0\u3618 \u3585 \u3648 \u3621 \u3636 \u3585 </button>\
+                    <button type="submit" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold shadow-md">\uc0\u3610 \u3633 \u3609 \u3607 \u3638 \u3585 \u3586 \u3657 \u3629 \u3617 \u3641 \u3621 </button>\
+                </div>\
+            </form>\
+        </div>\
+    </div>\
+\
+    <!-- 3. QUEUE MODAL overlay -->\
+    <div id="queue-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">\
+        <div class="w-full max-w-2xl p-6 rounded-3xl shadow-xl border border-purple-100 bg-white text-zinc-800 dark:bg-zinc-900 dark:border-zinc-800 dark:text-white animate-scale-up max-h-[90vh] overflow-y-auto">\
+            <div class="flex justify-between items-center pb-4 border-b border-zinc-100 dark:border-zinc-800 mb-4">\
+                <h3 id="queue-modal-title" class="text-base font-black flex items-center gap-2">\
+                    <span>\uc0\u55358 \u56793 \u8205 \u9792 \u65039 </span> \u3648 \u3614 \u3636 \u3656 \u3617 \u3611 \u3619 \u3632 \u3623 \u3633 \u3605 \u3636 \u3588 \u3636 \u3623 \u3592 \u3629 \u3591 \u3604 \u3641 \u3604 \u3623 \u3591 \u3586 \u3629 \u3591 \u3621 \u3641 \u3585 \u3604 \u3623 \u3591 \
+                </h3>\
+                <button type="button" class="modal-close-btn text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200" data-modal="queue-modal">\
+                    <i class="fa-solid fa-xmark"></i>\
+                </button>\
+            </div>\
+\
+            <form id="queue-form" class="space-y-4 text-xs">\
+                <input type="hidden" id="queue-form-id">\
+                <input type="hidden" id="queue-form-code">\
+\
+                <!-- SECTION 1: Customer Personal Info -->\
+                <div class="border-b border-dashed border-zinc-100 dark:border-zinc-800 pb-4">\
+                    <h4 class="font-bold text-purple-600 dark:text-purple-400 mb-3 text-[11px] uppercase tracking-wider">\uc0\u55357 \u56420  \u3586 \u3657 \u3629 \u3617 \u3641 \u3621 \u3614 \u3639 \u3657 \u3609 \u3600 \u3634 \u3609 \u3586 \u3629 \u3591 \u3621 \u3641 \u3585 \u3604 \u3623 \u3591 </h4>\
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">\
+                        <div>\
+                            <label class="font-bold text-zinc-500 dark:text-zinc-400 block mb-1">\uc0\u3594 \u3639 \u3656 \u3629 \u3648 \u3621 \u3656 \u3609 \u3621 \u3641 \u3585 \u3604 \u3623 \u3591  *</label>\
+                            <input type="text" id="queue-nickname" placeholder="\uc0\u3585 \u3619 \u3629 \u3585 \u3594 \u3639 \u3656 \u3629 \u3648 \u3621 \u3656 \u3609 " class="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-white focus:outline-none">\
+                            <p id="queue-nickname-error" class="text-[10px] text-rose-500 mt-1 hidden"></p>\
+                        </div>\
+\
+                        <div>\
+                            <label class="font-bold text-zinc-500 dark:text-zinc-400 block mb-1">\uc0\u3594 \u3639 \u3656 \u3629 \u3592 \u3619 \u3636 \u3591 -\u3609 \u3634 \u3617 \u3626 \u3585 \u3640 \u3621 </label>\
+                            <input type="text" id="queue-fullname" placeholder="\uc0\u3585 \u3619 \u3629 \u3585 \u3594 \u3639 \u3656 \u3629 \u3592 \u3619 \u3636 \u3591 \u3648 \u3614 \u3639 \u3656 \u3629 \u3648 \u3626 \u3619 \u3636 \u3617 \u3624 \u3634 \u3626 \u3605 \u3619 \u3660 " class="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-white focus:outline-none">\
+                        </div>\
+\
+                        <div class="grid grid-cols-2 gap-2">\
+                            <div>\
+                                <label class="font-bold text-zinc-500 dark:text-zinc-400 block mb-1">\uc0\u3629 \u3634 \u3618 \u3640  (\u3611 \u3637 )</label>\
+                                <input type="number" id="queue-age" placeholder="\uc0\u3585 \u3619 \u3629 \u3585 \u3629 \u3634 \u3618 \u3640 " class="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-white focus:outline-none">\
+                            </div>\
+                            <div>\
+                                <label class="font-bold text-zinc-500 dark:text-zinc-400 block mb-1">\uc0\u3648 \u3614 \u3624 \u3626 \u3616 \u3634 \u3614 </label>\
+                                <select id="queue-gender" class="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-white focus:outline-none">\
+                                    <option value="\uc0\u3627 \u3597 \u3636 \u3591 ">\u3627 \u3597 \u3636 \u3591 </option>\
+                                    <option value="\uc0\u3594 \u3634 \u3618 ">\u3594 \u3634 \u3618 </option>\
+                                    <option value="LGBTQ+">LGBTQ+</option>\
+                                    <option value="\uc0\u3652 \u3617 \u3656 \u3619 \u3632 \u3610 \u3640 ">\u3652 \u3617 \u3656 \u3619 \u3632 \u3610 \u3640 </option>\
+                                </select>\
+                            </div>\
+                        </div>\
+                    </div>\
+\
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">\
+                        <div>\
+                            <label class="font-bold text-zinc-500 dark:text-zinc-400 block mb-1">\uc0\u3594 \u3656 \u3629 \u3591 \u3607 \u3634 \u3591 \u3627 \u3621 \u3633 \u3585 \u3605 \u3636 \u3604 \u3605 \u3656 \u3629  *</label>\
+                            <select id="queue-contact-channel" class="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-white focus:outline-none">\
+                                <option value="LINE">LINE</option>\
+                                <option value="Facebook">Facebook</option>\
+                                <option value="X (Twitter)">X (Twitter)</option>\
+                                <option value="Instagram">Instagram</option>\
+                                <option value="TikTok">TikTok</option>\
+                                <option value="Discord">Discord</option>\
+                                <option value="\uc0\u3629 \u3639 \u3656 \u3609  \u3654 ">\u3629 \u3639 \u3656 \u3609  \u3654 </option>\
+                            </select>\
+                        </div>\
+\
+                        <div>\
+                            <label class="font-bold text-zinc-500 dark:text-zinc-400 block mb-1">\uc0\u3594 \u3639 \u3656 \u3629 \u3610 \u3633 \u3597 \u3594 \u3637 \u3612 \u3641 \u3657 \u3651 \u3594 \u3657  (Username) *</label>\
+                            <input type="text" id="queue-contact-account" placeholder="\uc0\u3648 \u3594 \u3656 \u3609  @username" class="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-white focus:outline-none">\
+                            <p id="queue-contact-account-error" class="text-[10px] text-rose-500 mt-1 hidden"></p>\
+                        </div>\
+\
+                        <div>\
+                            <label class="font-bold text-zinc-500 dark:text-zinc-400 block mb-1">\uc0\u3621 \u3636 \u3591 \u3585 \u3660 \u3605 \u3636 \u3604 \u3605 \u3656 \u3629 \u3605 \u3619 \u3591  (Direct Link)</label>\
+                            <input type="text" id="queue-profile-link" placeholder="https://..." class="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-white focus:outline-none">\
+                        </div>\
+                    </div>\
+                </div>\
+\
+                <!-- SECTION 2: Prediction Package & Money Details -->\
+                <div class="border-b border-dashed border-zinc-100 dark:border-zinc-800 pb-4">\
+                    <h4 class="font-bold text-purple-600 dark:text-purple-400 mb-3 text-[11px] uppercase tracking-wider">\uc0\u55357 \u56622  \u3619 \u3634 \u3618 \u3621 \u3632 \u3648 \u3629 \u3637 \u3618 \u3604 \u3585 \u3634 \u3619 \u3614 \u3618 \u3634 \u3585 \u3619 \u3603 \u3660  & \u3649 \u3614 \u3655 \u3585 \u3648 \u3585 \u3592 </h4>\
+                    \
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">\
+                        <div>\
+                            <label class="font-bold text-zinc-500 dark:text-zinc-400 block mb-1">\uc0\u3648 \u3621 \u3639 \u3629 \u3585 \u3649 \u3617 \u3656 \u3627 \u3617 \u3629 \u3614 \u3618 \u3634 \u3585 \u3619 \u3603 \u3660  *</label>\
+                            <select id="queue-teller-id" class="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-white focus:outline-none"></select>\
+                        </div>\
+\
+                        <div class="sm:col-span-2">\
+                            <label class="font-bold text-zinc-500 dark:text-zinc-400 block mb-1">\uc0\u3648 \u3621 \u3639 \u3629 \u3585 \u3648 \u3619 \u3605 \u3619 \u3634 \u3588 \u3634 \u3649 \u3614 \u3655 \u3585 \u3648 \u3585 \u3592  *</label>\
+                            <select id="queue-package-id" class="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-white focus:outline-none"></select>\
+                        </div>\
+\
+                        <div>\
+                            <label class="font-bold text-zinc-500 dark:text-zinc-400 block mb-1">\uc0\u3592 \u3635 \u3609 \u3623 \u3609 \u3588 \u3635 \u3606 \u3634 \u3617  / \u3648 \u3607 \u3656 \u3634  *</label>\
+                            <input type="number" id="queue-question-count" min="1" value="1" class="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-white focus:outline-none">\
+                        </div>\
+                    </div>\
+\
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3 p-3.5 rounded-2xl bg-purple-50/30 dark:bg-zinc-950 border border-purple-100/10">\
+                        <div>\
+                            <span class="font-bold text-zinc-500 dark:text-zinc-400 block mb-1">\uc0\u3618 \u3629 \u3604 \u3619 \u3623 \u3617 \u3588 \u3656 \u3634 \u3610 \u3619 \u3636 \u3585 \u3634 \u3619  (\u3610 \u3634 \u3607 )</span>\
+                            <input type="number" id="queue-total-price" class="w-full p-2 rounded-lg border border-zinc-200 dark:border-zinc-800 font-bold text-purple-600 dark:text-purple-400 bg-white dark:bg-zinc-900 focus:outline-none">\
+                        </div>\
+\
+                        <div>\
+                            <span class="font-bold text-zinc-500 dark:text-zinc-400 block mb-1">\uc0\u3626 \u3606 \u3634 \u3609 \u3632 \u3594 \u3635 \u3619 \u3632 \u3648 \u3591 \u3636 \u3609  *</span>\
+                            <select id="queue-payment-status" class="w-full p-2 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-800 dark:text-white focus:outline-none">\
+                                <option value="\uc0\u3618 \u3633 \u3591 \u3652 \u3617 \u3656 \u3594 \u3635 \u3619 \u3632 ">\u3618 \u3633 \u3591 \u3652 \u3617 \u3656 \u3594 \u3635 \u3619 \u3632 </option>\
+                                <option value="\uc0\u3617 \u3633 \u3604 \u3592 \u3635 \u3649 \u3621 \u3657 \u3623 ">\u3617 \u3633 \u3604 \u3592 \u3635 \u3649 \u3621 \u3657 \u3623 </option>\
+                                <option value="\uc0\u3594 \u3635 \u3619 \u3632 \u3588 \u3619 \u3610 \u3649 \u3621 \u3657 \u3623 ">\u3594 \u3635 \u3619 \u3632 \u3588 \u3619 \u3610 \u3649 \u3621 \u3657 \u3623 </option>\
+                                <option value="\uc0\u3588 \u3639 \u3609 \u3648 \u3591 \u3636 \u3609 \u3649 \u3621 \u3657 \u3623 ">\u3588 \u3639 \u3609 \u3648 \u3591 \u3636 \u3609 \u3649 \u3621 \u3657 \u3623 </option>\
+                            </select>\
+                        </div>\
+\
+                        <div>\
+                            <div class="flex justify-between">\
+                                <span class="font-bold text-zinc-500 dark:text-zinc-400 block mb-1">\uc0\u3592 \u3656 \u3634 \u3618 \u3649 \u3621 \u3657 \u3623 \u3592 \u3619 \u3636 \u3591  (\u3610 \u3634 \u3607 )</span>\
+                                <span class="text-[10px] text-zinc-400">\uc0\u3588 \u3591 \u3648 \u3627 \u3621 \u3639 \u3629 : <span id="queue-remaining-balance" class="font-bold">0</span> \u3610 .</span>\
+                            </div>\
+                            <input type="number" id="queue-paid-amount" value="0" class="w-full p-2 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-800 dark:text-white focus:outline-none">\
+                        </div>\
+                    </div>\
+                </div>\
+\
+                <!-- SECTION 3: Estimation delivery details and Customer Questions -->\
+                <div>\
+                    <h4 class="font-bold text-purple-600 dark:text-purple-400 mb-3 text-[11px] uppercase tracking-wider">\uc0\u9203  \u3585 \u3635 \u3627 \u3609 \u3604 \u3609 \u3633 \u3604 \u3626 \u3656 \u3591 \u3588 \u3635 \u3607 \u3635 \u3609 \u3634 \u3618  & \u3605 \u3633 \u3623 \u3649 \u3611 \u3619 \u3591 \u3634 \u3609 </h4>\
+                    \
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">\
+                        <div>\
+                            <label class="font-bold text-zinc-500 dark:text-zinc-400 block mb-1">\uc0\u3623 \u3633 \u3609 \u3607 \u3637 \u3656 \u3588 \u3634 \u3604 \u3623 \u3656 \u3634 \u3592 \u3632 \u3626 \u3656 \u3591 \u3617 \u3629 \u3610  *</label>\
+                            <input type="date" id="queue-est-date" class="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-white focus:outline-none">\
+                        </div>\
+\
+                        <div>\
+                            <label class="font-bold text-zinc-500 dark:text-zinc-400 block mb-1">\uc0\u3648 \u3623 \u3621 \u3634 \u3588 \u3634 \u3604 \u3623 \u3656 \u3634 \u3592 \u3632 \u3626 \u3656 \u3591 \u3617 \u3629 \u3610  *</label>\
+                            <input type="time" id="queue-est-time" value="20:00" class="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-white focus:outline-none">\
+                        </div>\
+\
+                        <div>\
+                            <label class="font-bold text-zinc-500 dark:text-zinc-400 block mb-1">\uc0\u3626 \u3606 \u3634 \u3609 \u3632 \u3604 \u3635 \u3648 \u3609 \u3636 \u3609 \u3588 \u3636 \u3623 \u3591 \u3634 \u3609  *</label>\
+                            <select id="queue-job-status" class="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-white focus:outline-none">\
+                                <option value="\uc0\u3619 \u3629 \u3594 \u3635 \u3619 \u3632 \u3648 \u3591 \u3636 \u3609 ">\u8987  \u3619 \u3629 \u3594 \u3635 \u3619 \u3632 \u3648 \u3591 \u3636 \u3609 </option>\
+                                <option value="\uc0\u3619 \u3629 \u3588 \u3635 \u3607 \u3635 \u3609 \u3634 \u3618 ">\u55357 \u56622  \u3619 \u3629 \u3588 \u3635 \u3607 \u3635 \u3609 \u3634 \u3618  (\u3588 \u3636 \u3623 \u3606 \u3633 \u3604 \u3652 \u3611 )</option>\
+                                <option value="\uc0\u3585 \u3635 \u3621 \u3633 \u3591 \u3607 \u3635 \u3609 \u3634 \u3618 ">\u10024  \u3585 \u3635 \u3621 \u3633 \u3591 \u3607 \u3635 \u3609 \u3634 \u3618  (\u3649 \u3617 \u3656 \u3627 \u3617 \u3629 \u3585 \u3635 \u3621 \u3633 \u3591 \u3627 \u3618 \u3636 \u3610 \u3652 \u3614 \u3656 )</option>\
+                                <option value="\uc0\u3619 \u3629 \u3626 \u3656 \u3591 \u3588 \u3635 \u3607 \u3635 \u3609 \u3634 \u3618 ">\u55357 \u56552  \u3619 \u3629 \u3626 \u3656 \u3591 \u3588 \u3635 \u3607 \u3635 \u3609 \u3634 \u3618 </option>\
+                                <option value="\uc0\u3626 \u3656 \u3591 \u3588 \u3635 \u3607 \u3635 \u3609 \u3634 \u3618 \u3649 \u3621 \u3657 \u3623 ">\u9989  \u3626 \u3656 \u3591 \u3588 \u3635 \u3607 \u3635 \u3609 \u3634 \u3618 \u3649 \u3621 \u3657 \u3623 </option>\
+                                <option value="\uc0\u3618 \u3585 \u3648 \u3621 \u3636 \u3585 ">\u10060  \u3618 \u3585 \u3648 \u3621 \u3636 \u3585 </option>\
+                            </select>\
+                        </div>\
+                    </div>\
+\
+                    <div class="mt-3">\
+                        <label class="font-bold text-zinc-500 dark:text-zinc-400 block mb-1">\uc0\u3588 \u3635 \u3606 \u3634 \u3617 \u3586 \u3629 \u3591 \u3621 \u3641 \u3585 \u3604 \u3623 \u3591  *</label>\
+                        <textarea id="queue-questions" rows="4" placeholder="\uc0\u3614 \u3636 \u3617 \u3614 \u3660 \u3588 \u3635 \u3606 \u3634 \u3617 \u3586 \u3629 \u3591 \u3621 \u3641 \u3585 \u3604 \u3623 \u3591 \u3607 \u3637 \u3656 \u3609 \u3637 \u3656  \u3648 \u3614 \u3639 \u3656 \u3629 \u3588 \u3623 \u3634 \u3617 \u3626 \u3632 \u3604 \u3623 \u3585 \u3651 \u3609 \u3585 \u3634 \u3619 \u3623 \u3636 \u3648 \u3588 \u3619 \u3634 \u3632 \u3627 \u3660 \u3649 \u3621 \u3632 \u3592 \u3633 \u3604 \u3626 \u3635 \u3619 \u3633 \u3610 \u3652 \u3614 \u3656 ..." class="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-purple-500"></textarea>\
+                        <p id="queue-questions-error" class="text-[10px] text-rose-500 mt-1 hidden"></p>\
+                    </div>\
+\
+                    <div class="mt-3">\
+                        <label class="font-bold text-zinc-500 dark:text-zinc-400 block mb-1">\uc0\u3627 \u3617 \u3634 \u3618 \u3648 \u3627 \u3605 \u3640 \u3616 \u3634 \u3618 \u3651 \u3609 \u3586 \u3629 \u3591 \u3649 \u3617 \u3656 \u3627 \u3617 \u3629  (\u3610 \u3633 \u3609 \u3607 \u3638 \u3585 \u3626 \u3656 \u3623 \u3609 \u3605 \u3633 \u3623 )</label>\
+                        <textarea id="queue-notes" rows="2" placeholder="\uc0\u3648 \u3594 \u3656 \u3609  \u3648 \u3609 \u3657 \u3609 \u3648 \u3609 \u3639 \u3657 \u3629 \u3588 \u3641 \u3656 \u3605 \u3656 \u3634 \u3591 \u3594 \u3634 \u3605 \u3636 , \u3617 \u3633 \u3604 \u3592 \u3635 \u3649 \u3621 \u3657 \u3623  50%, \u3627 \u3619 \u3639 \u3629 \u3586 \u3629 \u3588 \u3635 \u3605 \u3629 \u3610 \u3585 \u3619 \u3632 \u3594 \u3633 \u3610 \u3654 " class="w-full p-2.5 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-800 dark:text-white focus:outline-none"></textarea>\
+                    </div>\
+                </div>\
+\
+                <div class="pt-4 border-t border-zinc-100 dark:border-zinc-800 flex justify-end gap-3">\
+                    <button type="button" class="modal-close-btn px-4 py-2 rounded-xl font-bold bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300" data-modal="queue-modal">\uc0\u3618 \u3585 \u3648 \u3621 \u3636 \u3585 </button>\
+                    <button type="submit" class="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold shadow-md shadow-purple-600/10">\uc0\u3610 \u3633 \u3609 \u3607 \u3638 \u3585 \u3588 \u3636 \u3623 \u3591 \u3634 \u3609 </button>\
+                </div>\
+            </form>\
+        </div>\
+    </div>\
+\
+    <!-- 4. CUSTOMER PROFILE & HISTORY MODAL overlay -->\
+    <div id="customer-profile-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">\
+        <div class="w-full max-w-2xl p-6 rounded-3xl shadow-xl border border-purple-100 bg-white text-zinc-800 dark:bg-zinc-900 dark:border-zinc-800 dark:text-white animate-scale-up max-h-[90vh] overflow-y-auto">\
+            <div class="flex justify-between items-center pb-4 border-b border-zinc-100 dark:border-zinc-800 mb-4">\
+                <h3 class="text-base font-black flex items-center gap-2">\
+                    <span>\uc0\u55357 \u57057 \u65039 </span> \u3586 \u3657 \u3629 \u3617 \u3641 \u3621 \u3650 \u3611 \u3619 \u3652 \u3615 \u3621 \u3660 \u3649 \u3621 \u3632 \u3611 \u3619 \u3632 \u3623 \u3633 \u3605 \u3636 \u3585 \u3634 \u3619 \u3651 \u3594 \u3657 \u3610 \u3619 \u3636 \u3585 \u3634 \u3619 \u3621 \u3641 \u3585 \u3604 \u3623 \u3591 \
+                </h3>\
+                <button type="button" class="modal-close-btn text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200" data-modal="customer-profile-modal">\
+                    <i class="fa-solid fa-xmark"></i>\
+                </button>\
+            </div>\
+\
+            <div class="space-y-6 text-xs">\
+                <!-- Profile details -->\
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 rounded-2xl bg-purple-50/40 dark:bg-zinc-950 border border-purple-100/15 gap-4">\
+                    <div>\
+                        <span class="text-[10px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-widest">\uc0\u3611 \u3619 \u3632 \u3623 \u3633 \u3605 \u3636 \u3621 \u3641 \u3585 \u3604 \u3623 \u3591 \u3588 \u3609 \u3626 \u3635 \u3588 \u3633 \u3597 </span>\
+                        <h2 id="prof-nickname" class="text-xl font-black mt-1 text-zinc-900 dark:text-white">\uc0\u3588 \u3640 \u3603  \u3610 \u3637 </h2>\
+                        <p id="prof-details" class="text-zinc-400 dark:text-zinc-500 mt-1">\uc0\u3594 \u3639 \u3656 \u3629 \u3592 \u3619 \u3636 \u3591 : \u3609 \u3616 \u3633 \u3626 \u3626 \u3619  \u3617 \u3637 \u3626 \u3640 \u3586  \'95 \u3629 \u3634 \u3618 \u3640 : 24 \'95 \u3648 \u3614 \u3624 : \u3627 \u3597 \u3636 \u3591 </p>\
+                        <p id="prof-contact" class="text-zinc-400 dark:text-zinc-500 mt-0.5">\uc0\u3594 \u3656 \u3629 \u3591 \u3607 \u3634 \u3591 \u3605 \u3636 \u3604 \u3605 \u3656 \u3629 : LINE (@bee_napassorn)</p>\
+                        <a id="prof-link-element" href="#" target="_blank" class="mt-2 inline-flex items-center gap-1 text-purple-600 dark:text-purple-400 hover:underline font-bold text-[11px] hidden">\
+                            \uc0\u55357 \u56599  \u3648 \u3611 \u3636 \u3604 \u3621 \u3636 \u3591 \u3585 \u3660 \u3627 \u3609 \u3657 \u3634 \u3650 \u3611 \u3619 \u3652 \u3615 \u3621 \u3660 \u3621 \u3641 \u3585 \u3604 \u3623 \u3591 \u3605 \u3619 \u3591 \
+                        </a>\
+                    </div>\
+\
+                    <div class="flex gap-4 border-l border-zinc-200 dark:border-zinc-800 pl-4 w-full sm:w-auto">\
+                        <div class="text-center flex-1 sm:flex-initial">\
+                            <span id="prof-total-visits" class="text-2xl font-black text-purple-600 dark:text-purple-400">0</span>\
+                            <p class="text-[10px] text-zinc-400">\uc0\u3592 \u3635 \u3609 \u3623 \u3609 \u3588 \u3619 \u3633 \u3657 \u3591 \u3607 \u3637 \u3656 \u3604 \u3641 \u3604 \u3623 \u3591 </p>\
+                        </div>\
+                        <div class="text-center flex-1 sm:flex-initial">\
+                            <span id="prof-total-spent" class="text-2xl font-black text-indigo-600 dark:text-indigo-400">0 \uc0\u3647 </span>\
+                            <p class="text-[10px] text-zinc-400">\uc0\u3618 \u3629 \u3604 \u3648 \u3591 \u3636 \u3609 \u3651 \u3594 \u3657 \u3592 \u3656 \u3634 \u3618 \u3626 \u3632 \u3626 \u3617 </p>\
+                        </div>\
+                    </div>\
+                </div>\
+\
+                <!-- History questions chronology -->\
+                <div>\
+                    <h4 class="text-xs font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider mb-3">\uc0\u55357 \u56658  \u3610 \u3633 \u3609 \u3607 \u3638 \u3585 \u3619 \u3634 \u3618 \u3585 \u3634 \u3619 \u3588 \u3635 \u3606 \u3634 \u3617 \u3649 \u3621 \u3632 \u3588 \u3636 \u3623 \u3592 \u3629 \u3591 \u3618 \u3657 \u3629 \u3609 \u3627 \u3621 \u3633 \u3591 </h4>\
+                    <div class="space-y-3.5" id="prof-history-list-container"></div>\
+                </div>\
+\
+                <div class="pt-4 border-t border-zinc-100 dark:border-zinc-800 flex justify-between items-center">\
+                    <button id="prof-delete-all-btn" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold transition-all">\
+                        \uc0\u55357 \u56785 \u65039  \u3621 \u3610 \u3586 \u3657 \u3629 \u3617 \u3641 \u3621 \u3588 \u3636 \u3623 \u3621 \u3641 \u3585 \u3604 \u3623 \u3591 \u3607 \u3633 \u3657 \u3591 \u3627 \u3617 \u3604 \
+                    </button>\
+                    <button type="button" class="modal-close-btn px-4 py-2 rounded-xl font-bold bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300" data-modal="customer-profile-modal">\
+                        \uc0\u3611 \u3636 \u3604 \u3627 \u3609 \u3657 \u3634 \u3605 \u3656 \u3634 \u3591 \
+                    </button>\
+                </div>\
+            </div>\
+        </div>\
+    </div>\
+\
+    <!-- JAVASCRIPT SYSTEM ENGINE -->\
+    <script>\
+        \
+        // Mock Initial Data used as DB seed\
+        const initialTellers = [\
+            \{ id: 't1', name: '\uc0\u3649 \u3617 \u3656 \u3627 \u3617 \u3629 \u3649 \u3614 \u3619 \u3623 \u3634  \u3614 \u3618 \u3634 \u3585 \u3619 \u3603 \u3660 ', pageName: '\u3627 \u3617 \u3629 \u3649 \u3614 \u3619 \u3623 \u3634  \u3652 \u3614 \u3656 \u3618 \u3636 \u3611 \u3595 \u3637 \u3610 \u3635 \u3610 \u3633 \u3604 ', tel: '0812345678', contact: 'LINE: @praewatarot', status: 'open', avatar: '\u55357 \u56622 ' \},\
+            \{ id: 't2', name: '\uc0\u3649 \u3617 \u3656 \u3627 \u3617 \u3629 \u3648 \u3617 \u3618 \u3660  \u3592 \u3636 \u3605 \u3626 \u3633 \u3617 \u3612 \u3633 \u3626 ', pageName: '\u3648 \u3617 \u3618 \u3660 \u3607 \u3634 \u3650 \u3619 \u3656 \u3605 \u3660  \u3626 \u3639 \u3656 \u3629 \u3619 \u3633 \u3585 ', tel: '0898765432', contact: 'Facebook: MayTarot', status: 'open', avatar: '\u10024 ' \},\
+            \{ id: 't3', name: '\uc0\u3627 \u3617 \u3629 \u3629 \u3634 \u3619 \u3660 \u3607  \u3624 \u3634 \u3626 \u3605 \u3619 \u3660 \u3605 \u3633 \u3623 \u3648 \u3621 \u3586 ', pageName: '\u3629 \u3634 \u3619 \u3660 \u3605 \u3607 \u3634 \u3650 \u3619 \u3656 \u3605 \u3660 \u3588 \u3636 \u3623 \u3607 \u3629 \u3591 ', tel: '0855551212', contact: 'Instagram: art_tarot', status: 'closed', avatar: '\u55356 \u57113 ' \}\
+        ];\
+\
+        const initialPackages = [\
+            \{ id: 'p1', name: '1 \uc0\u3588 \u3635 \u3606 \u3634 \u3617 \u3618 \u3629 \u3604 \u3630 \u3636 \u3605 ', type: '\u3606 \u3634 \u3617 \u3648 \u3593 \u3614 \u3634 \u3632 \u3648 \u3619 \u3639 \u3656 \u3629 \u3591 ', price: 39, detail: '\u3606 \u3634 \u3617 \u3648 \u3619 \u3639 \u3656 \u3629 \u3591 \u3651 \u3604 \u3585 \u3655 \u3652 \u3604 \u3657  1 \u3588 \u3635 \u3606 \u3634 \u3617  \u3605 \u3629 \u3610 \u3585 \u3619 \u3632 \u3594 \u3633 \u3610 \u3612 \u3656 \u3634 \u3609 \u3649 \u3594 \u3607 ' \},\
+            \{ id: 'p2', name: '3 \uc0\u3588 \u3635 \u3606 \u3634 \u3617 \u3626 \u3640 \u3604 \u3588 \u3640 \u3657 \u3617 ', type: '\u3606 \u3634 \u3617 \u3648 \u3593 \u3614 \u3634 \u3632 \u3648 \u3619 \u3639 \u3656 \u3629 \u3591 ', price: 99, detail: '\u3606 \u3634 \u3617 \u3621 \u3638 \u3585 \u3595 \u3638 \u3657 \u3591  3 \u3588 \u3635 \u3606 \u3634 \u3617  \u3614 \u3619 \u3657 \u3629 \u3617 \u3649 \u3609 \u3632 \u3649 \u3609 \u3623 \u3607 \u3634 \u3591 \u3649 \u3585 \u3657 \u3652 \u3586 ' \},\
+            \{ id: 'p3', name: '5 \uc0\u3588 \u3635 \u3606 \u3634 \u3617 \u3592 \u3633 \u3604 \u3648 \u3605 \u3655 \u3617 ', type: '\u3606 \u3634 \u3617 \u3648 \u3593 \u3614 \u3634 \u3632 \u3648 \u3619 \u3639 \u3656 \u3629 \u3591 ', price: 149, detail: '\u3623 \u3636 \u3648 \u3588 \u3619 \u3634 \u3632 \u3627 \u3660  5 \u3588 \u3635 \u3606 \u3634 \u3617 \u3588 \u3619 \u3629 \u3610 \u3588 \u3621 \u3640 \u3617 \u3594 \u3637 \u3623 \u3636 \u3605  \u3607 \u3640 \u3585 \u3617 \u3636 \u3605 \u3636 ' \},\
+            \{ id: 'p4', name: '\uc0\u3604 \u3641 \u3604 \u3623 \u3591 \u3588 \u3623 \u3634 \u3617 \u3619 \u3633 \u3585 \u3648 \u3609 \u3639 \u3657 \u3629 \u3588 \u3641 \u3656 ', type: '\u3648 \u3593 \u3614 \u3634 \u3632 \u3607 \u3634 \u3591 ', price: 99, detail: '\u3648 \u3592 \u3634 \u3632 \u3621 \u3638 \u3585 \u3626 \u3606 \u3634 \u3609 \u3632 \u3588 \u3623 \u3634 \u3617 \u3619 \u3633 \u3585  \u3588 \u3609 \u3650 \u3626 \u3604  \u3588 \u3609 \u3617 \u3637 \u3588 \u3641 \u3656  \u3649 \u3621 \u3632 \u3649 \u3609 \u3623 \u3650 \u3609 \u3657 \u3617 \u3651 \u3609  3 \u3648 \u3604 \u3639 \u3629 \u3609 ' \},\
+            \{ id: 'p5', name: '\uc0\u3604 \u3641 \u3604 \u3623 \u3591 \u3585 \u3634 \u3619 \u3591 \u3634 \u3609 \u3585 \u3634 \u3619 \u3648 \u3591 \u3636 \u3609 ', type: '\u3648 \u3593 \u3614 \u3634 \u3632 \u3607 \u3634 \u3591 ', price: 99, detail: '\u3649 \u3609 \u3623 \u3650 \u3609 \u3657 \u3617 \u3648 \u3611 \u3621 \u3637 \u3656 \u3618 \u3609 \u3591 \u3634 \u3609  \u3648 \u3621 \u3639 \u3656 \u3629 \u3609 \u3586 \u3633 \u3657 \u3609  \u3649 \u3621 \u3632 \u3650 \u3594 \u3588 \u3621 \u3634 \u3616 \u3585 \u3634 \u3619 \u3648 \u3591 \u3636 \u3609 ' \},\
+            \{ id: 'p6', name: '\uc0\u3604 \u3641 \u3604 \u3623 \u3591 \u3619 \u3634 \u3618 \u3648 \u3604 \u3639 \u3629 \u3609 \u3621 \u3632 \u3648 \u3629 \u3637 \u3618 \u3604 ', type: '\u3616 \u3634 \u3614 \u3619 \u3623 \u3617 \u3619 \u3634 \u3618 \u3648 \u3604 \u3639 \u3629 \u3609 ', price: 199, detail: '\u3623 \u3636 \u3648 \u3588 \u3619 \u3634 \u3632 \u3627 \u3660 \u3604 \u3623 \u3591 \u3616 \u3634 \u3614 \u3619 \u3623 \u3617 \u3605 \u3621 \u3629 \u3604  30 \u3623 \u3633 \u3609 \u3586 \u3657 \u3634 \u3591 \u3627 \u3609 \u3657 \u3634 \u3629 \u3618 \u3656 \u3634 \u3591 \u3621 \u3632 \u3648 \u3629 \u3637 \u3618 \u3604 ' \}\
+        ];\
+\
+        const initialQueues = [\
+            \{ \
+                id: 'q1', \
+                queueCode: 'NT-000001',\
+                nickname: '\uc0\u3610 \u3637 ', \
+                fullname: '\uc0\u3609 \u3616 \u3633 \u3626 \u3626 \u3619  \u3617 \u3637 \u3626 \u3640 \u3586 ', \
+                age: 24, \
+                gender: '\uc0\u3627 \u3597 \u3636 \u3591 ', \
+                contactChannel: 'LINE', \
+                contactAccount: '@bee_napassorn', \
+                profileLink: 'https://line.me/ti/p/bee_napassorn',\
+                tellerId: 't1', \
+                packageId: 'p2', \
+                questionCount: 3, \
+                totalPrice: 99, \
+                paymentStatus: '\uc0\u3594 \u3635 \u3619 \u3632 \u3588 \u3619 \u3610 \u3649 \u3621 \u3657 \u3623 ', \
+                paidAmount: 99, \
+                estDate: '2026-06-23', \
+                estTime: '18:00', \
+                jobStatus: '\uc0\u3619 \u3629 \u3588 \u3635 \u3607 \u3635 \u3609 \u3634 \u3618 ', \
+                questions: '1. \uc0\u3649 \u3615 \u3609 \u3648 \u3585 \u3656 \u3634 \u3592 \u3632 \u3585 \u3621 \u3633 \u3610 \u3617 \u3634 \u3652 \u3627 \u3617 \u3616 \u3634 \u3618 \u3651 \u3609 \u3648 \u3604 \u3639 \u3629 \u3609 \u3609 \u3637 \u3657 \\n2. \u3585 \u3634 \u3619 \u3591 \u3634 \u3609 \u3607 \u3637 \u3656 \u3626 \u3617 \u3633 \u3588 \u3619 \u3651 \u3627 \u3617 \u3656 \u3592 \u3632 \u3612 \u3656 \u3634 \u3609 \u3626 \u3633 \u3617 \u3616 \u3634 \u3625 \u3603 \u3660 \u3652 \u3627 \u3617 \\n3. \u3585 \u3634 \u3619 \u3648 \u3591 \u3636 \u3609 \u3651 \u3609 \u3594 \u3656 \u3623 \u3591 \u3588 \u3619 \u3638 \u3656 \u3591 \u3611 \u3637 \u3627 \u3621 \u3633 \u3591 \u3592 \u3632 \u3648 \u3611 \u3655 \u3609 \u3629 \u3618 \u3656 \u3634 \u3591 \u3652 \u3619 ',\
+                notes: '\uc0\u3605 \u3657 \u3629 \u3591 \u3585 \u3634 \u3619 \u3588 \u3635 \u3607 \u3635 \u3609 \u3634 \u3618 \u3649 \u3610 \u3610 \u3606 \u3609 \u3629 \u3617 \u3609 \u3657 \u3635 \u3651 \u3592 ',\
+                createdAt: '2026-06-21T10:30:00.000Z'\
+            \},\
+            \{ \
+                id: 'q2', \
+                queueCode: 'NT-000002',\
+                nickname: '\uc0\u3605 \u3657 \u3609 ', \
+                fullname: '\uc0\u3611 \u3600 \u3617 \u3614 \u3591 \u3624 \u3660  \u3623 \u3591 \u3624 \u3660 \u3604 \u3637 ', \
+                age: 31, \
+                gender: '\uc0\u3594 \u3634 \u3618 ', \
+                contactChannel: 'Facebook', \
+                contactAccount: 'Ton Pathompong', \
+                profileLink: 'https://facebook.com/ton.pathompong',\
+                tellerId: 't1', \
+                packageId: 'p1', \
+                questionCount: 1, \
+                totalPrice: 39, \
+                paymentStatus: '\uc0\u3618 \u3633 \u3591 \u3652 \u3617 \u3656 \u3594 \u3635 \u3619 \u3632 ', \
+                paidAmount: 0, \
+                estDate: '2026-06-22', \
+                estTime: '20:00', \
+                jobStatus: '\uc0\u3619 \u3629 \u3594 \u3635 \u3619 \u3632 \u3648 \u3591 \u3636 \u3609 ', \
+                questions: '\uc0\u3626 \u3629 \u3610 \u3606 \u3634 \u3617 \u3648 \u3619 \u3639 \u3656 \u3629 \u3591 \u3588 \u3623 \u3634 \u3617 \u3619 \u3633 \u3585 \u3588 \u3619 \u3633 \u3610  \u3588 \u3609 \u3588 \u3640 \u3618 \u3611 \u3633 \u3592 \u3592 \u3640 \u3610 \u3633 \u3609 \u3648 \u3586 \u3634 \u3619 \u3641 \u3657 \u3626 \u3638 \u3585 \u3629 \u3618 \u3656 \u3634 \u3591 \u3652 \u3619 \u3585 \u3633 \u3610 \u3648 \u3619 \u3634 ',\
+                notes: '\uc0\u3626 \u3656 \u3591 \u3586 \u3657 \u3629 \u3588 \u3623 \u3634 \u3617 \u3648 \u3605 \u3639 \u3629 \u3609 \u3648 \u3617 \u3639 \u3656 \u3629 \u3606 \u3638 \u3591 \u3585 \u3635 \u3627 \u3609 \u3604 \u3594 \u3635 \u3619 \u3632 \u3648 \u3591 \u3636 \u3609 ',\
+                createdAt: '2026-06-22T08:15:00.000Z'\
+            \},\
+            \{ \
+                id: 'q3', \
+                queueCode: 'NT-000003',\
+                nickname: '\uc0\u3609 \u3636 \u3585 \u3585 \u3637 \u3657 ', \
+                fullname: '\uc0\u3609 \u3636 \u3624 \u3634 \u3594 \u3621  \u3619 \u3640 \u3656 \u3591 \u3648 \u3619 \u3639 \u3629 \u3591 ', \
+                age: 28, \
+                gender: 'LGBTQ+', \
+                contactChannel: 'Instagram', \
+                contactAccount: '@nikky_sparkle', \
+                profileLink: 'https://instagram.com/nikky_sparkle',\
+                tellerId: 't2', \
+                packageId: 'p4', \
+                questionCount: 1, \
+                totalPrice: 99, \
+                paymentStatus: '\uc0\u3617 \u3633 \u3604 \u3592 \u3635 \u3649 \u3621 \u3657 \u3623 ', \
+                paidAmount: 50, \
+                estDate: '2026-06-24', \
+                estTime: '15:30', \
+                jobStatus: '\uc0\u3585 \u3635 \u3621 \u3633 \u3591 \u3607 \u3635 \u3609 \u3634 \u3618 ', \
+                questions: '\uc0\u3629 \u3618 \u3634 \u3585 \u3619 \u3641 \u3657 \u3623 \u3656 \u3634 \u3588 \u3609 \u3607 \u3637 \u3656 \u3648 \u3586 \u3657 \u3634 \u3617 \u3634 \u3592 \u3637 \u3610 \u3594 \u3656 \u3623 \u3591 \u3609 \u3637 \u3657 \u3592 \u3619 \u3636 \u3591 \u3651 \u3592 \u3652 \u3627 \u3617  \u3649 \u3621 \u3632 \u3648 \u3611 \u3655 \u3609 \u3588 \u3609 \u3621 \u3633 \u3585 \u3625 \u3603 \u3632 \u3629 \u3618 \u3656 \u3634 \u3591 \u3652 \u3619 ',\
+                notes: '\uc0\u3648 \u3609 \u3657 \u3609 \u3623 \u3636 \u3648 \u3588 \u3619 \u3634 \u3632 \u3627 \u3660 \u3609 \u3636 \u3626 \u3633 \u3618 \u3612 \u3641 \u3657 \u3594 \u3634 \u3618 \u3607 \u3637 \u3656 \u3648 \u3586 \u3657 \u3634 \u3617 \u3634 \u3614 \u3633 \u3623 \u3614 \u3633 \u3609 ',\
+                createdAt: '2026-06-22T11:45:00.000Z'\
+            \},\
+            \{ \
+                id: 'q4', \
+                queueCode: 'NT-000004',\
+                nickname: '\uc0\u3615 \u3657 \u3634 ', \
+                fullname: '\uc0\u3619 \u3604 \u3634 \u3614 \u3633 \u3594 \u3619  \u3629 \u3619 \u3640 \u3603 \u3626 \u3623 \u3633 \u3626 \u3604 \u3636 \u3660 ', \
+                age: 22, \
+                gender: '\uc0\u3627 \u3597 \u3636 \u3591 ', \
+                contactChannel: 'TikTok', \
+                contactAccount: '@fah_rada', \
+                profileLink: 'https://tiktok.com/@fah_rada',\
+                tellerId: 't2', \
+                packageId: 'p6', \
+                questionCount: 1, \
+                totalPrice: 199, \
+                paymentStatus: '\uc0\u3594 \u3635 \u3619 \u3632 \u3588 \u3619 \u3610 \u3649 \u3621 \u3657 \u3623 ', \
+                paidAmount: 199, \
+                estDate: '2026-06-20', \
+                estTime: '14:00', \
+                jobStatus: '\uc0\u3626 \u3656 \u3591 \u3588 \u3635 \u3607 \u3635 \u3609 \u3634 \u3618 \u3649 \u3621 \u3657 \u3623 ', \
+                questions: '\uc0\u3586 \u3629 \u3616 \u3634 \u3614 \u3619 \u3623 \u3617 \u3594 \u3637 \u3623 \u3636 \u3605 \u3619 \u3634 \u3618 \u3648 \u3604 \u3639 \u3629 \u3609 \u3588 \u3656 \u3632  \u3607 \u3633 \u3657 \u3591 \u3619 \u3633 \u3585  \u3591 \u3634 \u3609  \u3648 \u3591 \u3636 \u3609  \u3649 \u3621 \u3632 \u3626 \u3640 \u3586 \u3616 \u3634 \u3614 ',\
+                notes: '\uc0\u3626 \u3656 \u3591 \u3588 \u3635 \u3607 \u3635 \u3609 \u3634 \u3618 \u3651 \u3627 \u3657 \u3607 \u3634 \u3591  DM TikTok \u3648 \u3619 \u3637 \u3618 \u3610 \u3619 \u3657 \u3629 \u3618 ',\
+                createdAt: '2026-06-19T09:00:00.000Z'\
+            \}\
+        ];\
+\
+        // Global Application Runtime State\
+        const State = \{\
+            tellers: JSON.parse(localStorage.getItem('tarot_tellers')) || [...initialTellers],\
+            packages: JSON.parse(localStorage.getItem('tarot_packages')) || [...initialPackages],\
+            queues: JSON.parse(localStorage.getItem('tarot_queues')) || [...initialQueues],\
+            currentRole: 'Admin', // 'Admin' | 'FortuneTeller'\
+            selectedTellerId: 'all', // Used for admin selector\
+            currentTellerUser: null, // Selected fortune teller under 'FortuneTeller' role\
+            currentPage: 'dashboard',\
+            darkMode: localStorage.getItem('tarot_dark_mode') === 'true',\
+            currentPageNum: 1,\
+            itemsPerPage: 6,\
+            searchQuery: '',\
+            filterStatus: 'all',\
+            filterPayment: 'all',\
+            filterTeller: 'all',\
+            filterDate: '',\
+        \};\
+\
+        // Show Global UI Toast Alert\
+        function showToast(message, type = 'success') \{\
+            const container = document.getElementById('toast-container');\
+            const toastId = Date.now();\
+            \
+            const toast = document.createElement('div');\
+            toast.id = `toast-$\{toastId\}`;\
+            toast.className = `flex items-center justify-between p-4 rounded-xl shadow-lg border animate-slide-in text-sm font-medium transition-all pointer-events-auto $\{\
+                type === 'error' \
+                    ? 'bg-rose-50 border-rose-100 text-rose-800 dark:bg-rose-950/90 dark:border-rose-900/40 dark:text-rose-200' \
+                    : 'bg-emerald-50 border-emerald-100 text-emerald-800 dark:bg-emerald-950/90 dark:border-emerald-900/40 dark:text-emerald-200'\
+            \}`;\
+            \
+            toast.innerHTML = `\
+                <span>$\{message\}</span>\
+                <button onclick="document.getElementById('toast-$\{toastId\}').remove()" class="ml-2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 focus:outline-none">\
+                    <i class="fa-solid fa-xmark"></i>\
+                </button>\
+            `;\
+            container.appendChild(toast);\
+            \
+            setTimeout(() => \{\
+                const el = document.getElementById(`toast-$\{toastId\}`);\
+                if (el) el.remove();\
+            \}, 4000);\
+        \}\
+\
+        // Confirm Dialog state variables\
+        let confirmAction = null;\
+\
+        function openConfirmDialog(title, message, onConfirm) \{\
+            document.getElementById('confirm-title').innerText = title;\
+            document.getElementById('confirm-message').innerText = message;\
+            document.getElementById('confirm-modal').classList.remove('hidden');\
+            confirmAction = onConfirm;\
+        \}\
+\
+        // Close Confirm Dialog\
+        function closeConfirmDialog() \{\
+            document.getElementById('confirm-modal').classList.add('hidden');\
+            confirmAction = null;\
+        \}\
+\
+        // Save State in localStorage Helper\
+        function saveStateToStorage() \{\
+            localStorage.setItem('tarot_tellers', JSON.stringify(State.tellers));\
+            localStorage.setItem('tarot_packages', JSON.stringify(State.packages));\
+            localStorage.setItem('tarot_queues', JSON.stringify(State.queues));\
+        \}\
+\
+        // Calculate statistics based on filtered role and datasets\
+        function getAnalyticsStats() \{\
+            const filteredQueues = State.queues.filter(q => \{\
+                if (State.currentRole === 'FortuneTeller' && State.currentTellerUser) \{\
+                    return q.tellerId === State.currentTellerUser.id;\
+                \}\
+                return true;\
+            \});\
+\
+            const todayStr = new Date().toISOString().split('T')[0];\
+            const thisMonthStr = todayStr.substring(0, 7); // YYYY-MM\
+\
+            let pendingPaymentCount = 0;\
+            let pendingPredictionCount = 0;\
+            let predictingCount = 0;\
+            let deliveredCount = 0;\
+            let revenueToday = 0;\
+            let revenueMonth = 0;\
+            let totalRevenue = 0;\
+\
+            const packageCountMap = \{\};\
+            const customerCountMap = \{\};\
+\
+            filteredQueues.forEach(q => \{\
+                if (q.jobStatus === '\uc0\u3619 \u3629 \u3594 \u3635 \u3619 \u3632 \u3648 \u3591 \u3636 \u3609 ') pendingPaymentCount++;\
+                if (q.jobStatus === '\uc0\u3619 \u3629 \u3588 \u3635 \u3607 \u3635 \u3609 \u3634 \u3618 ') pendingPredictionCount++;\
+                if (q.jobStatus === '\uc0\u3585 \u3635 \u3621 \u3633 \u3591 \u3607 \u3635 \u3609 \u3634 \u3618 ') predictingCount++;\
+                if (q.jobStatus === '\uc0\u3626 \u3656 \u3591 \u3588 \u3635 \u3607 \u3635 \u3609 \u3634 \u3618 \u3649 \u3621 \u3657 \u3623 ') deliveredCount++;\
+\
+                const amount = parseFloat(q.paidAmount) || 0;\
+                totalRevenue += amount;\
+\
+                if (q.createdAt && q.createdAt.startsWith(todayStr)) \{\
+                    revenueToday += amount;\
+                \}\
+                if (q.createdAt && q.createdAt.startsWith(thisMonthStr)) \{\
+                    revenueMonth += amount;\
+                \}\
+\
+                if (q.packageId) \{\
+                    packageCountMap[q.packageId] = (packageCountMap[q.packageId] || 0) + 1;\
+                \}\
+\
+                if (q.fullname || q.nickname) \{\
+                    const key = q.fullname || q.nickname;\
+                    customerCountMap[key] = (customerCountMap[key] || 0) + 1;\
+                \}\
+            \});\
+\
+            // Popular packages\
+            const popularPackages = Object.keys(packageCountMap).map(id => \{\
+                const pkg = State.packages.find(p => p.id === id);\
+                return \{\
+                    name: pkg ? pkg.name : '\uc0\u3607 \u3633 \u3656 \u3623 \u3652 \u3611 ',\
+                    count: packageCountMap[id],\
+                    revenue: packageCountMap[id] * (pkg ? pkg.price : 0)\
+                \};\
+            \}).sort((a, b) => b.count - a.count).slice(0, 3);\
+\
+            // Regular customers list\
+            const regularCustomers = Object.keys(customerCountMap).map(name => \{\
+                const customerQueues = filteredQueues.filter(q => (q.fullname || q.nickname) === name);\
+                const totalSpent = customerQueues.reduce((sum, q) => sum + (parseFloat(q.paidAmount) || 0), 0);\
+                return \{\
+                    name,\
+                    count: customerCountMap[name],\
+                    spent: totalSpent\
+                \};\
+            \}).sort((a, b) => b.count - a.count).slice(0, 5);\
+\
+            const newCustomersCount = Object.values(customerCountMap).filter(v => v === 1).length;\
+            const returningCustomersCount = Object.values(customerCountMap).filter(v => v > 1).length;\
+\
+            // Past 5 days revenue statistics calculations\
+            const last5Days = Array.from(\{ length: 5 \}, (_, i) => \{\
+                const d = new Date();\
+                d.setDate(d.getDate() - (4 - i));\
+                return d.toISOString().split('T')[0];\
+            \});\
+\
+            const revenueByDay = last5Days.map(dateStr => \{\
+                const dayTotal = filteredQueues\
+                    .filter(q => q.createdAt && q.createdAt.startsWith(dateStr))\
+                    .reduce((sum, q) => sum + (parseFloat(q.paidAmount) || 0), 0);\
+                const dayCount = filteredQueues\
+                    .filter(q => q.createdAt && q.createdAt.startsWith(dateStr)).length;\
+                const [,, d] = dateStr.split('-');\
+                return \{ label: `$\{d\} \uc0\u3617 \u3636 .\u3618 .`, amount: dayTotal, count: dayCount \};\
+            \});\
+\
+            return \{\
+                pendingPaymentCount,\
+                pendingPredictionCount,\
+                predictingCount,\
+                deliveredCount,\
+                revenueToday,\
+                revenueMonth,\
+                totalRevenue,\
+                popularPackages,\
+                regularCustomers,\
+                newCustomersCount,\
+                returningCustomersCount,\
+                revenueByDay\
+            \};\
+        \}\
+\
+        // Build active warnings & alerts\
+        function getSystemAlerts() \{\
+            const alerts = [];\
+            const now = new Date();\
+\
+            State.queues.forEach(q => \{\
+                if (q.paymentStatus === '\uc0\u3618 \u3633 \u3591 \u3652 \u3617 \u3656 \u3594 \u3635 \u3619 \u3632 ' || q.jobStatus === '\u3619 \u3629 \u3594 \u3635 \u3619 \u3632 \u3648 \u3591 \u3636 \u3609 ') \{\
+                    alerts.push(\{\
+                        type: 'warning',\
+                        title: '\uc0\u3588 \u3657 \u3634 \u3591 \u3594 \u3635 \u3619 \u3632 \u3648 \u3591 \u3636 \u3609 ',\
+                        message: `\uc0\u3588 \u3636 \u3623  $\{q.queueCode\} ($\{q.nickname\}) \u3618 \u3633 \u3591 \u3652 \u3617 \u3656 \u3652 \u3604 \u3657 \u3594 \u3635 \u3619 \u3632 \u3588 \u3656 \u3634 \u3610 \u3619 \u3636 \u3585 \u3634 \u3619 `,\
+                        queueId: q.id\
+                    \});\
+                \}\
+\
+                if (q.estDate && q.jobStatus !== '\uc0\u3626 \u3656 \u3591 \u3588 \u3635 \u3607 \u3635 \u3609 \u3634 \u3618 \u3649 \u3621 \u3657 \u3623 ' && q.jobStatus !== '\u3618 \u3585 \u3648 \u3621 \u3636 \u3585 ') \{\
+                    try \{\
+                        const estTimeStr = q.estTime || '23:59';\
+                        const estDateTime = new Date(`$\{q.estDate\}T$\{estTimeStr\}:00`);\
+                        const diffMs = estDateTime - now;\
+                        const diffHrs = diffMs / (1000 * 60 * 60);\
+\
+                        if (diffHrs > 0 && diffHrs <= 24) \{\
+                            alerts.push(\{\
+                                type: 'urgent',\
+                                title: '\uc0\u3651 \u3585 \u3621 \u3657 \u3585 \u3635 \u3627 \u3609 \u3604 \u3626 \u3656 \u3591 ',\
+                                message: `\uc0\u3588 \u3636 \u3623  $\{q.queueCode\} ($\{q.nickname\}) \u3592 \u3632 \u3588 \u3619 \u3610 \u3585 \u3635 \u3627 \u3609 \u3604 \u3651 \u3609  $\{Math.round(diffHrs)\} \u3594 \u3633 \u3656 \u3623 \u3650 \u3617 \u3591 `,\
+                                queueId: q.id\
+                            \});\
+                        \} else if (diffHrs <= 0) \{\
+                            alerts.push(\{\
+                                type: 'danger',\
+                                title: '\uc0\u3648 \u3621 \u3618 \u3585 \u3635 \u3627 \u3609 \u3604 \u3626 \u3656 \u3591  \u9888 \u65039 ',\
+                                message: `\uc0\u3588 \u3636 \u3623  $\{q.queueCode\} ($\{q.nickname\}) \u3648 \u3621 \u3618 \u3585 \u3635 \u3627 \u3609 \u3604 \u3648 \u3623 \u3621 \u3634 \u3626 \u3656 \u3591 \u3649 \u3621 \u3657 \u3623 !`,\
+                                queueId: q.id\
+                            \});\
+                        \}\
+                    \} catch (e) \{\}\
+                \}\
+            \});\
+\
+            return alerts.slice(0, 6);\
+        \}\
+\
+        // Dashboard Render Function\
+        function renderDashboard() \{\
+            const stats = getAnalyticsStats();\
+            const alerts = getSystemAlerts();\
+\
+            // Render summary cards indicators\
+            const summaryGrid = document.getElementById('summary-cards-grid');\
+            const summaryCardsData = [\
+                \{ title: '\uc0\u3619 \u3629 \u3594 \u3635 \u3619 \u3632 \u3648 \u3591 \u3636 \u3609 ', val: stats.pendingPaymentCount, unit: '\u3588 \u3609 ', color: 'bg-amber-500/10 text-amber-500 border-amber-500/20' \},\
+                \{ title: '\uc0\u3619 \u3629 \u3588 \u3635 \u3607 \u3635 \u3609 \u3634 \u3618 ', val: stats.pendingPredictionCount, unit: '\u3588 \u3609 ', color: 'bg-purple-500/10 text-purple-500 border-purple-500/20' \},\
+                \{ title: '\uc0\u3585 \u3635 \u3621 \u3633 \u3591 \u3607 \u3635 \u3609 \u3634 \u3618 ', val: stats.predictingCount, unit: '\u3588 \u3609 ', color: 'bg-blue-500/10 text-blue-500 border-blue-500/20' \},\
+                \{ title: '\uc0\u3626 \u3656 \u3591 \u3612 \u3621 \u3607 \u3635 \u3609 \u3634 \u3618 \u3649 \u3621 \u3657 \u3623 ', val: stats.deliveredCount, unit: '\u3588 \u3609 ', color: 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20' \},\
+                \{ title: '\uc0\u3619 \u3634 \u3618 \u3652 \u3604 \u3657 \u3623 \u3633 \u3609 \u3609 \u3637 \u3657 ', val: stats.revenueToday.toLocaleString(), unit: '\u3610 \u3634 \u3607 ', color: 'bg-indigo-500/10 text-indigo-500 border-indigo-500/20' \},\
+                \{ title: '\uc0\u3619 \u3634 \u3618 \u3652 \u3604 \u3657 \u3648 \u3604 \u3639 \u3629 \u3609 \u3609 \u3637 \u3657 ', val: stats.revenueMonth.toLocaleString(), unit: '\u3610 \u3634 \u3607 ', color: 'bg-pink-500/10 text-pink-500 border-pink-500/20' \}\
+            ];\
+\
+            summaryGrid.innerHTML = summaryCardsData.map(item => `\
+                <div class="p-4 rounded-2xl border flex flex-col justify-between $\{item.color\} bg-white dark:bg-zinc-900/60 dark:border-zinc-800">\
+                    <span class="text-[11px] font-bold text-zinc-400 dark:text-zinc-500">$\{item.title\}</span>\
+                    <div class="mt-2.5 flex items-baseline gap-1">\
+                        <span class="text-2xl font-black tracking-tight">$\{item.val\}</span>\
+                        <span class="text-[10px] font-bold opacity-80">$\{item.unit\}</span>\
+                    </div>\
+                </div>\
+            `).join('');\
+\
+            // Render alert panel\
+            const alertsSection = document.getElementById('dashboard-alerts-section');\
+            const alertsGrid = document.getElementById('dashboard-alerts-grid');\
+            if (alerts.length > 0) \{\
+                alertsSection.classList.remove('hidden');\
+                alertsGrid.innerHTML = alerts.map(alert => `\
+                    <div onclick="openCustomerProfileById('$\{alert.queueId\}')" class="p-3.5 rounded-2xl border flex items-start gap-3 cursor-pointer transition-all hover:scale-[1.01] $\{\
+                        alert.type === 'danger'\
+                            ? 'bg-red-100/40 border-red-200 text-red-900 dark:bg-red-950/20 dark:border-red-900/40 dark:text-red-200'\
+                            : alert.type === 'warning'\
+                            ? 'bg-amber-100/30 border-amber-200 text-amber-900 dark:bg-amber-950/10 dark:border-amber-900/30 dark:text-amber-200'\
+                            : 'bg-purple-100/30 border-purple-200 text-purple-900 dark:bg-purple-950/10 dark:border-purple-900/30 dark:text-purple-200'\
+                    \}">\
+                        <span class="text-lg">\
+                            $\{alert.type === 'danger' ? '\uc0\u55357 \u57000 ' : alert.type === 'warning' ? '\u55357 \u56499 ' : '\u9203 '\}\
+                        </span>\
+                        <div>\
+                            <p class="text-xs font-bold">$\{alert.title\}</p>\
+                            <p class="text-[11px] opacity-90 mt-0.5">$\{alert.message\}</p>\
+                        </div>\
+                    </div>\
+                `).join('');\
+            \} else \{\
+                alertsSection.classList.add('hidden');\
+            \}\
+\
+            // Render active prediction workloads\
+            const activeQueuesGrid = document.getElementById('dashboard-active-queues-grid');\
+            const activeQueues = State.queues.filter(q => \{\
+                if (State.currentRole === 'FortuneTeller' && State.currentTellerUser) \{\
+                    return q.tellerId === State.currentTellerUser.id && (q.jobStatus === '\uc0\u3585 \u3635 \u3621 \u3633 \u3591 \u3607 \u3635 \u3609 \u3634 \u3618 ' || q.jobStatus === '\u3619 \u3629 \u3588 \u3635 \u3607 \u3635 \u3609 \u3634 \u3618 ');\
+                \}\
+                return q.jobStatus === '\uc0\u3585 \u3635 \u3621 \u3633 \u3591 \u3607 \u3635 \u3609 \u3634 \u3618 ' || q.jobStatus === '\u3619 \u3629 \u3588 \u3635 \u3607 \u3635 \u3609 \u3634 \u3618 ';\
+            \}).slice(0, 4);\
+\
+            if (activeQueues.length === 0) \{\
+                activeQueuesGrid.innerHTML = `\
+                    <div class="p-8 rounded-3xl border border-dashed border-purple-100 dark:border-zinc-800 text-center col-span-2 bg-white dark:bg-zinc-900/30">\
+                        <span class="text-3xl block">\uc0\u55356 \u57096 </span>\
+                        <p class="text-xs text-zinc-400 mt-2">\uc0\u3652 \u3617 \u3656 \u3617 \u3637 \u3588 \u3636 \u3623 \u3607 \u3637 \u3656 \u3585 \u3635 \u3621 \u3633 \u3591 \u3607 \u3635 \u3609 \u3634 \u3618 \u3651 \u3609 \u3586 \u3603 \u3632 \u3609 \u3637 \u3657  \u3614 \u3633 \u3585 \u3612 \u3656 \u3629 \u3609 \u3651 \u3627 \u3657 \u3648 \u3605 \u3655 \u3617 \u3607 \u3637 \u3656 \u3609 \u3632 \u3588 \u3632 !</p>\
+                    </div>\
+                `;\
+            \} else \{\
+                activeQueuesGrid.innerHTML = activeQueues.map(q => \{\
+                    const teller = State.tellers.find(t => t.id === q.tellerId);\
+                    const pkg = State.packages.find(p => p.id === q.packageId);\
+                    return `\
+                        <div onclick="openCustomerProfileById('$\{q.id\}')" class="p-4 rounded-2xl border cursor-pointer hover:shadow-md transition-all flex flex-col justify-between bg-white dark:bg-zinc-900/60 border-purple-100 dark:border-zinc-800 hover:border-purple-200 dark:hover:border-zinc-700">\
+                            <div>\
+                                <div class="flex justify-between items-center">\
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-lg bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300">\
+                                        $\{q.queueCode\}\
+                                    </span>\
+                                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-lg $\{\
+                                        q.jobStatus === '\uc0\u3585 \u3635 \u3621 \u3633 \u3591 \u3607 \u3635 \u3609 \u3634 \u3618 ' \
+                                            ? 'bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300' \
+                                            : 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300'\
+                                    \}">\
+                                        $\{q.jobStatus\}\
+                                    </span>\
+                                </div>\
+\
+                                <h4 class="text-sm font-black mt-2.5">$\{q.nickname\} ($\{q.age\} \uc0\u3611 \u3637 )</h4>\
+                                <p class="text-[11px] text-zinc-400 mt-0.5">$\{pkg ? pkg.name : '\uc0\u3607 \u3633 \u3656 \u3623 \u3652 \u3611 '\} \'95 \u3619 \u3623 \u3617  $\{q.totalPrice\} \u3610 .</p>\
+                                \
+                                <div class="mt-3 p-2 rounded-xl text-[11px] italic line-clamp-2 bg-zinc-50 dark:bg-zinc-950 text-zinc-500 dark:text-zinc-400">\
+                                    "$\{q.questions\}"\
+                                </div>\
+                            </div>\
+\
+                            <div class="mt-4 pt-3 border-t border-dashed border-zinc-100 dark:border-zinc-800 flex justify-between items-center text-[10px] text-zinc-400">\
+                                <span>\uc0\u3585 \u3635 \u3627 \u3609 \u3604 \u3626 \u3656 \u3591 : $\{q.estDate\} ($\{q.estTime\})</span>\
+                                <span class="font-bold text-purple-600 dark:text-purple-400">\
+                                    $\{teller ? teller.name.split(' ')[0] : '\uc0\u3652 \u3617 \u3656 \u3619 \u3632 \u3610 \u3640 '\}\
+                                </span>\
+                            </div>\
+                        </div>\
+                    `;\
+                \}).join('');\
+            \}\
+\
+            // Render popular packages\
+            const popularList = document.getElementById('dash-popular-packages-list');\
+            if (stats.popularPackages.length === 0) \{\
+                popularList.innerHTML = `<p class="text-xs text-zinc-400 py-4 text-center">\uc0\u3652 \u3617 \u3656 \u3617 \u3637 \u3626 \u3606 \u3636 \u3605 \u3636 \u3649 \u3614 \u3655 \u3585 \u3648 \u3585 \u3592 </p>`;\
+            \} else \{\
+                popularList.innerHTML = stats.popularPackages.map((pkg, i) => `\
+                    <div class="flex justify-between items-center">\
+                        <div class="flex items-center gap-2">\
+                            <span class="text-xs font-bold text-purple-600 dark:text-purple-400">#$\{i+1\}</span>\
+                            <span class="text-xs font-medium truncate max-w-[120px] dark:text-zinc-300">$\{pkg.name\}</span>\
+                        </div>\
+                        <div class="text-right">\
+                            <span class="text-xs font-bold">$\{pkg.count\} \uc0\u3588 \u3636 \u3623 </span>\
+                            <p class="text-[9px] text-zinc-400">\uc0\u3619 \u3623 \u3617  $\{pkg.revenue\} \u3610 .</p>\
+                        </div>\
+                    </div>\
+                `).join('');\
+            \}\
+\
+            // Render regular customers list\
+            const regularList = document.getElementById('dash-regular-customers-list');\
+            if (stats.regularCustomers.length === 0) \{\
+                regularList.innerHTML = `<p class="text-xs text-zinc-400 py-4 text-center">\uc0\u3652 \u3617 \u3656 \u3617 \u3637 \u3586 \u3657 \u3629 \u3617 \u3641 \u3621 \u3611 \u3619 \u3632 \u3623 \u3633 \u3605 \u3636 \u3621 \u3641 \u3585 \u3604 \u3623 \u3591 </p>`;\
+            \} else \{\
+                regularList.innerHTML = stats.regularCustomers.map((cust, i) => `\
+                    <div class="flex justify-between items-center">\
+                        <span class="text-xs font-semibold dark:text-zinc-300">$\{cust.name\}</span>\
+                        <div class="text-right">\
+                            <span class="text-xs font-bold">$\{cust.count\} \uc0\u3588 \u3619 \u3633 \u3657 \u3591 </span>\
+                            <p class="text-[9px] text-zinc-400">\uc0\u3618 \u3629 \u3604 \u3626 \u3632 \u3626 \u3617  $\{cust.spent\} \u3610 .</p>\
+                        </div>\
+                    </div>\
+                `).join('');\
+            \}\
+\
+            // Update Header controller select items\
+            updateHeaderTellersDropdown();\
+        \}\
+\
+        // Queues Page Render Function\
+        function renderQueues() \{\
+            // Apply Search and Filters\
+            const filtered = State.queues.filter(q => \{\
+                // Filter by role/selected teller\
+                if (State.currentRole === 'FortuneTeller' && State.currentTellerUser) \{\
+                    if (q.tellerId !== State.currentTellerUser.id) return false;\
+                \} else if (State.currentRole === 'Admin' && State.selectedTellerId !== 'all') \{\
+                    if (q.tellerId !== State.selectedTellerId) return false;\
+                \}\
+\
+                // Filter by text search\
+                if (State.searchQuery.trim() !== '') \{\
+                    const search = State.searchQuery.toLowerCase();\
+                    const nickname = (q.nickname || '').toLowerCase();\
+                    const fullname = (q.fullname || '').toLowerCase();\
+                    const queueCode = (q.queueCode || '').toLowerCase();\
+                    const contactAccount = (q.contactAccount || '').toLowerCase();\
+                    const isMatch = nickname.includes(search) || \
+                                    fullname.includes(search) || \
+                                    queueCode.includes(search) || \
+                                    contactAccount.includes(search);\
+                    if (!isMatch) return false;\
+                \}\
+\
+                // Status Filter\
+                if (State.filterStatus !== 'all' && q.jobStatus !== State.filterStatus) return false;\
+\
+                // Payment Filter\
+                if (State.filterPayment !== 'all' && q.paymentStatus !== State.filterPayment) return false;\
+\
+                // Teller Filter\
+                if (State.filterTeller !== 'all' && q.tellerId !== State.filterTeller) return false;\
+\
+                // Date Filter\
+                if (State.filterDate && q.estDate !== State.filterDate) return false;\
+\
+                return true;\
+            \});\
+\
+            // Display filters clear btn\
+            const hasActiveFilters = State.searchQuery || State.filterStatus !== 'all' || State.filterPayment !== 'all' || State.filterTeller !== 'all' || State.filterDate;\
+            document.getElementById('clear-filters-btn-container').classList.toggle('hidden', !hasActiveFilters);\
+\
+            // Update counts\
+            document.getElementById('total-queues-count').innerText = filtered.length;\
+\
+            const emptyState = document.getElementById('queues-empty-state');\
+            const grid = document.getElementById('queues-cards-grid');\
+            const paginationContainer = document.getElementById('queues-pagination-container');\
+\
+            if (filtered.length === 0) \{\
+                emptyState.classList.remove('hidden');\
+                grid.classList.add('hidden');\
+                paginationContainer.classList.add('hidden');\
+                return;\
+            \}\
+\
+            emptyState.classList.add('hidden');\
+            grid.classList.remove('hidden');\
+            paginationContainer.classList.remove('hidden');\
+\
+            // Handle Pagination computation\
+            const totalPages = Math.ceil(filtered.length / State.itemsPerPage) || 1;\
+            if (State.currentPageNum > totalPages) State.currentPageNum = totalPages;\
+\
+            const startIndex = (State.currentPageNum - 1) * State.itemsPerPage;\
+            const paginated = filtered.slice(startIndex, startIndex + State.itemsPerPage);\
+\
+            // Update Pagination Status bar\
+            document.getElementById('pagination-status-text').innerText = `\uc0\u3649 \u3626 \u3604 \u3591 \u3588 \u3636 \u3623 \u3607 \u3637 \u3656  $\{startIndex + 1\} - $\{Math.min(startIndex + State.itemsPerPage, filtered.length)\} \u3592 \u3634 \u3585 \u3607 \u3633 \u3657 \u3591 \u3627 \u3617 \u3604  $\{filtered.length\} \u3588 \u3636 \u3623 `;\
+            document.getElementById('pagination-page-indicator').innerText = `$\{State.currentPageNum\} / $\{totalPages\}`;\
+            document.getElementById('pagination-prev-btn').disabled = State.currentPageNum === 1;\
+            document.getElementById('pagination-next-btn').disabled = State.currentPageNum === totalPages;\
+\
+            // Render Cards inside grid\
+            grid.innerHTML = paginated.map(q => \{\
+                const teller = State.tellers.find(t => t.id === q.tellerId);\
+                const pkg = State.packages.find(p => p.id === q.packageId);\
+                return `\
+                    <div class="p-5 rounded-2xl border transition-all flex flex-col justify-between bg-white dark:bg-zinc-900/60 border-purple-100 dark:border-zinc-800 shadow-sm hover:shadow-md">\
+                        <div>\
+                            <div class="flex items-center justify-between">\
+                                <span class="text-[10px] font-mono font-bold bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded-md">\
+                                    $\{q.queueCode\}\
+                                </span>\
+                                <div class="flex gap-1.5">\
+                                    <span class="text-[9px] font-bold px-2 py-0.5 rounded $\{\
+                                        q.paymentStatus === '\uc0\u3594 \u3635 \u3619 \u3632 \u3588 \u3619 \u3610 \u3649 \u3621 \u3657 \u3623 ' \
+                                            ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'\
+                                            : q.paymentStatus === '\uc0\u3617 \u3633 \u3604 \u3592 \u3635 \u3649 \u3621 \u3657 \u3623 '\
+                                            ? 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300'\
+                                            : 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300'\
+                                    \}">\
+                                        $\{q.paymentStatus\}\
+                                    </span>\
+                                    <span class="text-[9px] font-bold px-2 py-0.5 rounded $\{\
+                                        q.jobStatus === '\uc0\u3626 \u3656 \u3591 \u3588 \u3635 \u3607 \u3635 \u3609 \u3634 \u3618 \u3649 \u3621 \u3657 \u3623 ' \
+                                            ? 'bg-emerald-600 text-white'\
+                                            : q.jobStatus === '\uc0\u3585 \u3635 \u3621 \u3633 \u3591 \u3607 \u3635 \u3609 \u3634 \u3618 '\
+                                            ? 'bg-purple-600 text-white'\
+                                            : q.jobStatus === '\uc0\u3619 \u3629 \u3588 \u3635 \u3607 \u3635 \u3609 \u3634 \u3618 '\
+                                            ? 'bg-amber-500 text-white'\
+                                            : 'bg-zinc-400 text-white'\
+                                    \}">\
+                                        $\{q.jobStatus\}\
+                                    </span>\
+                                </div>\
+                            </div>\
+\
+                            <div class="mt-4">\
+                                <h4 class="text-base font-black flex items-center gap-1.5">\
+                                    <span>$\{q.nickname\}</span>\
+                                    <span class="text-xs text-zinc-400 dark:text-zinc-500 font-medium">($\{q.fullname || '\uc0\u3652 \u3617 \u3656 \u3621 \u3591 \u3594 \u3639 \u3656 \u3629 \u3592 \u3619 \u3636 \u3591 '\})</span>\
+                                </h4>\
+                                <p class="text-[11px] text-zinc-400 mt-0.5">\
+                                    \uc0\u3629 \u3634 \u3618 \u3640  $\{q.age || 'N/A'\} \u3611 \u3637  \'95 $\{q.gender || '\u3652 \u3617 \u3656 \u3619 \u3632 \u3610 \u3640 '\} \'95 \u3607 \u3634 \u3591  $\{q.contactChannel\}: <span class="font-semibold">$\{q.contactAccount\}</span>\
+                                </p>\
+                            </div>\
+\
+                            <div class="mt-4 p-3 rounded-xl bg-purple-50/50 dark:bg-zinc-950 border border-purple-100/20">\
+                                <p class="text-xs font-bold text-purple-700 dark:text-purple-400">$\{pkg ? pkg.name : '\uc0\u3649 \u3614 \u3655 \u3585 \u3648 \u3585 \u3592 \u3649 \u3610 \u3610 \u3585 \u3635 \u3627 \u3609 \u3604 \u3648 \u3629 \u3591 '\}</p>\
+                                <p class="text-[11px] text-zinc-400 mt-0.5">\uc0\u3619 \u3634 \u3588 \u3634 : $\{q.totalPrice\} \u3610 . (\u3592 \u3656 \u3634 \u3618 \u3649 \u3621 \u3657 \u3623 : $\{q.paidAmount\} \u3610 . / \u3588 \u3591 \u3648 \u3627 \u3621 \u3639 \u3629  $\{q.totalPrice - q.paidAmount\} \u3610 .)</p>\
+                                <p class="text-[11px] text-zinc-400 mt-1">\uc0\u3588 \u3635 \u3606 \u3634 \u3617  ($\{q.questionCount\} \u3586 \u3657 \u3629 ):</p>\
+                                <p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-0.5 italic line-clamp-2">\
+                                    "$\{q.questions\}"\
+                                </p>\
+                            </div>\
+\
+                            $\{q.notes ? `\
+                                <div class="mt-2.5 px-3 py-1.5 rounded-lg border border-dashed border-zinc-200 dark:border-zinc-800 text-[10px] text-zinc-400 italic">\
+                                    \uc0\u55357 \u56524  \u3650 \u3609 \u3657 \u3605 : $\{q.notes\}\
+                                </div>\
+                            ` : ''\}\
+                        </div>\
+\
+                        <div class="mt-5 pt-3.5 border-t border-dashed border-zinc-100 dark:border-zinc-800 flex items-center justify-between">\
+                            <div class="text-[10px] text-zinc-400">\
+                                <div>\uc0\u3612 \u3641 \u3657 \u3604 \u3641 \u3649 \u3621 : <span class="font-bold text-zinc-600 dark:text-zinc-300">$\{teller ? teller.name : '\u3652 \u3617 \u3656 \u3619 \u3632 \u3610 \u3640 '\}</span></div>\
+                                <div class="mt-0.5">\uc0\u3626 \u3656 \u3591 \u3607 \u3635 \u3609 \u3634 \u3618 : <span class="font-semibold text-rose-500">$\{q.estDate\} ($\{q.estTime\})</span></div>\
+                            </div>\
+\
+                            <div class="flex gap-1.5">\
+                                <button onclick="openCustomerProfileById('$\{q.id\}')" class="p-2 bg-purple-50 hover:bg-purple-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-purple-700 dark:text-purple-400 rounded-xl text-xs font-bold transition-all" title="\uc0\u3604 \u3641 \u3611 \u3619 \u3632 \u3623 \u3633 \u3605 \u3636 ">\
+                                    <i class="fa-solid fa-eye"></i>\
+                                </button>\
+                                <button onclick="openEditQueueModal('$\{q.id\}')" class="p-2 bg-zinc-100 hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-xl text-xs font-bold" title="\uc0\u3649 \u3585 \u3657 \u3652 \u3586 ">\
+                                    <i class="fa-solid fa-pen"></i>\
+                                </button>\
+                                <button onclick="deleteQueue('$\{q.id\}')" class="p-2 bg-rose-500/10 hover:bg-rose-500 hover:text-white text-rose-600 dark:text-rose-400 dark:hover:text-white rounded-xl text-xs font-bold transition-all" title="\uc0\u3621 \u3610 ">\
+                                    <i class="fa-solid fa-trash"></i>\
+                                </button>\
+                            </div>\
+                        </div>\
+                    </div>\
+                `;\
+            \}).join('');\
+        \}\
+\
+        // Tellers Page Render Function\
+        function renderTellers() \{\
+            const grid = document.getElementById('tellers-cards-grid');\
+            const emptyState = document.getElementById('tellers-empty-state');\
+\
+            if (State.tellers.length === 0) \{\
+                emptyState.classList.remove('hidden');\
+                grid.classList.add('hidden');\
+                return;\
+            \}\
+\
+            emptyState.classList.add('hidden');\
+            grid.classList.remove('hidden');\
+\
+            grid.innerHTML = State.tellers.map(t => \{\
+                const activeQueuesCount = State.queues.filter(q => q.tellerId === t.id && q.jobStatus !== '\uc0\u3626 \u3656 \u3591 \u3588 \u3635 \u3607 \u3635 \u3609 \u3634 \u3618 \u3649 \u3621 \u3657 \u3623 ' && q.jobStatus !== '\u3618 \u3585 \u3648 \u3621 \u3636 \u3585 ').length;\
+                return `\
+                    <div class="p-5 rounded-3xl border transition-all bg-white dark:bg-zinc-900/60 border-purple-100 dark:border-zinc-800 shadow-sm hover:shadow-md">\
+                        <div class="flex justify-between items-start">\
+                            <div class="flex gap-3">\
+                                <div class="w-12 h-12 rounded-2xl bg-purple-100 dark:bg-purple-950/40 flex items-center justify-center text-2xl shadow-inner">\
+                                    $\{t.avatar || '\uc0\u55357 \u56622 '\}\
+                                </div>\
+                                <div>\
+                                    <h4 class="text-sm font-black">$\{t.name\}</h4>\
+                                    <p class="text-[11px] text-zinc-400 mt-0.5">\uc0\u3648 \u3614 \u3592 : $\{t.pageName\}</p>\
+                                </div>\
+                            </div>\
+\
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-lg $\{\
+                                t.status === 'open' \
+                                    ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' \
+                                    : 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300'\
+                            \}">\
+                                $\{t.status === 'open' ? '\uc0\u55357 \u57314  \u3648 \u3611 \u3636 \u3604 \u3619 \u3633 \u3610 \u3591 \u3634 \u3609 ' : '\u55357 \u56628  \u3611 \u3636 \u3604 \u3619 \u3633 \u3610 \u3591 \u3634 \u3609 '\}\
+                            </span>\
+                        </div>\
+\
+                        <div class="mt-4 p-3 rounded-xl bg-purple-50/20 dark:bg-zinc-950 text-xs space-y-1.5">\
+                          <div>\uc0\u55357 \u56561  \u3648 \u3610 \u3629 \u3619 \u3660 \u3650 \u3607 \u3619 : <span class="font-semibold">$\{t.tel\}</span></div>\
+                          <div>\uc0\u55356 \u57104  \u3594 \u3656 \u3629 \u3591 \u3607 \u3634 \u3591 \u3605 \u3636 \u3604 \u3605 \u3656 \u3629 : <span class="font-semibold">$\{t.contact\}</span></div>\
+                          <div class="pt-2 border-t border-dashed border-zinc-100 dark:border-zinc-800 text-[11px] text-zinc-400">\
+                            \uc0\u3588 \u3636 \u3623 \u3607 \u3637 \u3656 \u3588 \u3657 \u3634 \u3591 \u3588 \u3634 \u3629 \u3618 \u3641 \u3656 \u3651 \u3609 \u3617 \u3639 \u3629 : <span class="font-bold text-purple-600 dark:text-purple-400">$\{activeQueuesCount\} \u3588 \u3636 \u3623 </span>\
+                          </div>\
+                        </div>\
+\
+                        <div class="mt-4 pt-3 border-t border-zinc-100 dark:border-zinc-800 flex justify-end gap-2">\
+                            <button onclick="openEditTellerModal('$\{t.id\}')" class="px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 rounded-lg text-xs font-semibold">\
+                                <i class="fa-solid fa-pen mr-1"></i> \uc0\u3649 \u3585 \u3657 \u3652 \u3586 \
+                            </button>\
+                            <button onclick="deleteTeller('$\{t.id\}')" class="px-3 py-1.5 bg-rose-500/10 text-rose-600 hover:bg-rose-500 hover:text-white rounded-lg text-xs font-semibold transition-all">\
+                                <i class="fa-solid fa-trash mr-1"></i> \uc0\u3621 \u3610 \
+                            </button>\
+                        </div>\
+                    </div>\
+                `;\
+            \}).join('');\
+        \}\
+\
+        // Packages Page Render Function\
+        function renderPackages() \{\
+            const grid = document.getElementById('packages-cards-grid');\
+            const emptyState = document.getElementById('packages-empty-state');\
+\
+            if (State.packages.length === 0) \{\
+                emptyState.classList.remove('hidden');\
+                grid.classList.add('hidden');\
+                return;\
+            \}\
+\
+            emptyState.classList.add('hidden');\
+            grid.classList.remove('hidden');\
+\
+            grid.innerHTML = State.packages.map(p => `\
+                <div class="p-5 rounded-3xl border flex flex-col justify-between transition-all bg-white dark:bg-zinc-900/60 border-purple-100 dark:border-zinc-800 shadow-sm hover:shadow-md">\
+                    <div>\
+                        <div class="flex justify-between items-center">\
+                            <span class="text-[10px] font-bold text-purple-600 dark:text-purple-400 uppercase tracking-widest bg-purple-50 dark:bg-purple-950/40 px-2 py-0.5 rounded">\
+                                $\{p.type\}\
+                            </span>\
+                            <span class="text-lg font-black text-indigo-600 dark:text-indigo-400">$\{p.price\} \uc0\u3647 </span>\
+                        </div>\
+                        <h4 class="text-sm font-black mt-3">$\{p.name\}</h4>\
+                        <p class="text-xs text-zinc-400 dark:text-zinc-500 mt-1 leading-relaxed">$\{p.detail\}</p>\
+                    </div>\
+\
+                    <div class="mt-5 pt-3.5 border-t border-zinc-100 dark:border-zinc-800 flex justify-end gap-2">\
+                        <button onclick="openEditPackageModal('$\{p.id\}')" class="px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200 rounded-lg text-xs font-semibold">\
+                            <i class="fa-solid fa-pen mr-1"></i> \uc0\u3649 \u3585 \u3657 \u3652 \u3586 \
+                        </button>\
+                        <button onclick="deletePackage('$\{p.id\}')" class="px-3 py-1.5 bg-rose-500/10 text-rose-600 hover:bg-rose-500 hover:text-white rounded-lg text-xs font-semibold transition-all">\
+                            <i class="fa-solid fa-trash mr-1"></i> \uc0\u3621 \u3610 \
+                        </button>\
+                    </div>\
+                </div>\
+            `).join('');\
+        \}\
+\
+        // Analytics Page Render Function\
+        function renderAnalytics() \{\
+            const stats = getAnalyticsStats();\
+\
+            // Total statistics values\
+            document.getElementById('stats-total-customers').innerText = stats.newCustomersCount + stats.returningCustomersCount;\
+            document.getElementById('stats-new-customers').innerText = `$\{stats.newCustomersCount\} \uc0\u3588 \u3609 `;\
+            document.getElementById('stats-returning-customers').innerText = `$\{stats.returningCustomersCount\} \uc0\u3588 \u3609 `;\
+\
+            // Draw SVG Revenue Chart dynamically\
+            const svgContainer = document.getElementById('analytics-chart-svg-container');\
+            const maxVal = Math.max(...stats.revenueByDay.map(d => d.amount), 500);\
+\
+            svgContainer.innerHTML = stats.revenueByDay.map((day, idx) => \{\
+                const barHeight = maxVal > 0 ? (day.amount / maxVal) * 100 : 0;\
+                return `\
+                    <div class="flex-1 flex flex-col items-center gap-2 group cursor-pointer h-full justify-end">\
+                        <div class="text-[10px] font-bold text-purple-600 dark:text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity">\
+                            $\{day.amount\} \uc0\u3610 .\
+                        </div>\
+                        \
+                        <!-- Bar -->\
+                        <div style="height: $\{Math.max(barHeight, 8)\}%" class="w-full rounded-t-xl bg-gradient-to-t from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 transition-all shadow-md shadow-purple-500/10"></div>\
+                        \
+                        <!-- Label -->\
+                        <div class="text-[10px] font-semibold text-zinc-400 mt-1">\
+                            $\{day.label\}\
+                        </div>\
+                    </div>\
+                `;\
+            \}).join('');\
+\
+            // Render Social Channels stats lists\
+            const channelsContainer = document.getElementById('stats-channels-container');\
+            const totalQueuesCount = State.queues.length || 1;\
+\
+            const channelsData = [\
+                \{ channel: 'LINE', count: State.queues.filter(q => q.contactChannel === 'LINE').length, color: 'bg-emerald-500' \},\
+                \{ channel: 'Facebook', count: State.queues.filter(q => q.contactChannel === 'Facebook').length, color: 'bg-blue-600' \},\
+                \{ channel: 'Instagram', count: State.queues.filter(q => q.contactChannel === 'Instagram').length, color: 'bg-pink-500' \},\
+                \{ channel: 'TikTok', count: State.queues.filter(q => q.contactChannel === 'TikTok').length, color: 'bg-zinc-900 dark:bg-white' \},\
+                \{ channel: '\uc0\u3629 \u3639 \u3656 \u3609  \u3654 ', count: State.queues.filter(q => !['LINE','Facebook','Instagram','TikTok'].includes(q.contactChannel)).length, color: 'bg-purple-400' \},\
+            ].sort((a, b) => b.count - a.count);\
+\
+            channelsContainer.innerHTML = channelsData.map(item => \{\
+                const percentage = Math.round((item.count / totalQueuesCount) * 100);\
+                return `\
+                    <div class="space-y-1">\
+                        <div class="flex justify-between text-xs">\
+                            <span class="font-semibold dark:text-zinc-300">$\{item.channel\}</span>\
+                            <span class="text-zinc-400 dark:text-zinc-500">$\{item.count\} \uc0\u3588 \u3636 \u3623  ($\{percentage\}%)</span>\
+                        </div>\
+                        <div class="w-full h-1.5 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden">\
+                            <div style="width: $\{percentage\}%" class="h-full $\{item.color\}"></div>\
+                        </div>\
+                    </div>\
+                `;\
+            \}).join('');\
+        \}\
+\
+        // Global Page Navigator helper\
+        function navigateToPage(pageId) \{\
+            State.currentPage = pageId;\
+            \
+            // Hide all pages\
+            document.querySelectorAll('.page-container').forEach(page => \{\
+                page.classList.add('hidden');\
+            \});\
+\
+            // Show target page\
+            document.getElementById(`$\{pageId\}-page`).classList.remove('hidden');\
+\
+            // Deactivate all navigation tabs\
+            document.querySelectorAll('.nav-tab-btn').forEach(btn => \{\
+                btn.classList.remove('border-purple-600', 'text-purple-600', 'dark:text-purple-400');\
+                btn.classList.add('border-transparent', 'text-zinc-400');\
+            \});\
+\
+            // Activate target tab button\
+            const activeBtn = document.querySelector(`.nav-tab-btn[data-tab="$\{pageId\}"]`);\
+            if (activeBtn) \{\
+                activeBtn.classList.add('border-purple-600', 'text-purple-600', 'dark:text-purple-400');\
+                activeBtn.classList.remove('border-transparent', 'text-zinc-400');\
+            \}\
+\
+            // Breadcrumb UI update\
+            const breadcrumbMap = \{\
+                dashboard: '\uc0\u3616 \u3634 \u3614 \u3619 \u3623 \u3617  / Dashboard',\
+                queues: '\uc0\u3619 \u3632 \u3610 \u3610 \u3592 \u3633 \u3604 \u3585 \u3634 \u3619 \u3588 \u3636 \u3623 \u3621 \u3641 \u3585 \u3604 \u3623 \u3591 ',\
+                tellers: '\uc0\u3619 \u3634 \u3618 \u3594 \u3639 \u3656 \u3629 \u3649 \u3617 \u3656 \u3627 \u3617 \u3629 \u3614 \u3618 \u3634 \u3585 \u3619 \u3603 \u3660 ',\
+                packages: '\uc0\u3629 \u3633 \u3605 \u3619 \u3634 \u3588 \u3656 \u3634 \u3610 \u3619 \u3636 \u3585 \u3634 \u3619 \u3649 \u3621 \u3632 \u3649 \u3614 \u3655 \u3585 \u3648 \u3585 \u3592 ',\
+                analytics: '\uc0\u3619 \u3634 \u3618 \u3591 \u3634 \u3609 \u3649 \u3621 \u3632 \u3585 \u3634 \u3619 \u3623 \u3636 \u3648 \u3588 \u3619 \u3634 \u3632 \u3627 \u3660 \u3648 \u3594 \u3636 \u3591 \u3621 \u3638 \u3585 '\
+            \};\
+            document.getElementById('breadcrumb-current-page').innerText = breadcrumbMap[pageId];\
+\
+            // Render specific page\
+            if (pageId === 'dashboard') renderDashboard();\
+            if (pageId === 'queues') renderQueues();\
+            if (pageId === 'tellers') renderTellers();\
+            if (pageId === 'packages') renderPackages();\
+            if (pageId === 'analytics') renderAnalytics();\
+        \}\
+\
+        // Update Selector Options for forms\
+        function updateHeaderTellersDropdown() \{\
+            const headerSelect = document.getElementById('header-teller-selector');\
+            if (State.currentRole === 'FortuneTeller') \{\
+                headerSelect.classList.remove('hidden');\
+                headerSelect.innerHTML = State.tellers.map(t => `\
+                    <option value="$\{t.id\}" $\{State.currentTellerUser && State.currentTellerUser.id === t.id ? 'selected' : ''\}>$\{t.name\}</option>\
+                `).join('');\
+            \} else \{\
+                headerSelect.classList.add('hidden');\
+            \}\
+        \}\
+\
+        // Populates selector dropdown options in Forms\
+        function populateFormSelectors() \{\
+            // Queue Teller Select\
+            const queueTellerSelect = document.getElementById('queue-teller-id');\
+            queueTellerSelect.innerHTML = State.tellers.map(t => `\
+                <option value="$\{t.id\}">$\{t.name\} $\{t.status === 'closed' ? '(\uc0\u3588 \u3636 \u3623 \u3649 \u3609 \u3656 \u3609 )' : ''\}</option>\
+            `).join('');\
+\
+            // Queue Package Select\
+            const queuePackageSelect = document.getElementById('queue-package-id');\
+            queuePackageSelect.innerHTML = State.packages.map(p => `\
+                <option value="$\{p.id\}">$\{p.name\} - $\{p.price\} \uc0\u3610 \u3634 \u3607 </option>\
+            `).join('');\
+\
+            // Queues Page Filter Teller dropdown\
+            const filterTellerSelect = document.getElementById('filter-teller');\
+            filterTellerSelect.innerHTML = `\
+                <option value="all">\uc0\u3649 \u3617 \u3656 \u3627 \u3617 \u3629 \u3607 \u3640 \u3585 \u3588 \u3609 </option>\
+                $\{State.tellers.map(t => `<option value="$\{t.id\}">$\{t.name\}</option>`).join('')\}\
+            `;\
+        \}\
+\
+        // Fortune Teller Delete Action\
+        function deleteTeller(id) \{\
+            openConfirmDialog('\uc0\u9888 \u65039  \u3618 \u3639 \u3609 \u3618 \u3633 \u3609 \u3585 \u3634 \u3619 \u3621 \u3610 \u3649 \u3617 \u3656 \u3627 \u3617 \u3629 ?', '\u3586 \u3657 \u3629 \u3617 \u3641 \u3621 \u3626 \u3656 \u3623 \u3609 \u3605 \u3633 \u3623  \u3594 \u3656 \u3629 \u3591 \u3607 \u3634 \u3591 \u3605 \u3636 \u3604 \u3605 \u3656 \u3629  \u3649 \u3621 \u3632 \u3585 \u3634 \u3619 \u3588 \u3633 \u3604 \u3588 \u3636 \u3623 \u3607 \u3633 \u3657 \u3591 \u3627 \u3617 \u3604 \u3586 \u3629 \u3591 \u3649 \u3617 \u3656 \u3627 \u3617 \u3629 \u3588 \u3609 \u3609 \u3637 \u3657 \u3592 \u3632 \u3606 \u3641 \u3585 \u3621 \u3610 \u3629 \u3629 \u3585 \u3592 \u3634 \u3585 \u3619 \u3632 \u3610 \u3610 \u3629 \u3618 \u3656 \u3634 \u3591 \u3606 \u3634 \u3623 \u3619 ', () => \{\
+                State.tellers = State.tellers.filter(t => t.id !== id);\
+                saveStateToStorage();\
+                showToast('\uc0\u55357 \u56785 \u65039  \u3621 \u3610 \u3626 \u3635 \u3648 \u3619 \u3655 \u3592 ');\
+                renderTellers();\
+                populateFormSelectors();\
+            \});\
+        \}\
+\
+        // Fortune Teller Edit modal opening handler\
+        function openEditTellerModal(id) \{\
+            const t = State.tellers.find(item => item.id === id);\
+            if (!t) return;\
+\
+            document.getElementById('teller-modal-title').innerText = '\uc0\u55357 \u56622  \u3649 \u3585 \u3657 \u3652 \u3586 \u3586 \u3657 \u3629 \u3617 \u3641 \u3621 \u3649 \u3617 \u3656 \u3627 \u3617 \u3629 ';\
+            document.getElementById('teller-form-id').value = t.id;\
+            document.getElementById('teller-name').value = t.name;\
+            document.getElementById('teller-page-name').value = t.pageName;\
+            document.getElementById('teller-tel').value = t.tel;\
+            document.getElementById('teller-contact').value = t.contact;\
+            document.getElementById('teller-status').value = t.status;\
+            document.getElementById('teller-avatar-input').value = t.avatar || '\uc0\u55357 \u56622 ';\
+\
+            // Select active avatar emoji\
+            selectAvatarEmoji(t.avatar || '\uc0\u55357 \u56622 ');\
+\
+            document.getElementById('teller-modal').classList.remove('hidden');\
+        \}\
+\
+        // Package Delete Action\
+        function deletePackage(id) \{\
+            openConfirmDialog('\uc0\u9888 \u65039  \u3618 \u3639 \u3609 \u3618 \u3633 \u3609 \u3585 \u3634 \u3619 \u3621 \u3610 \u3649 \u3614 \u3655 \u3585 \u3648 \u3585 \u3592 ?', '\u3619 \u3634 \u3588 \u3634 \u3649 \u3621 \u3632 \u3626 \u3636 \u3607 \u3608 \u3636 \u3585 \u3634 \u3619 \u3588 \u3635 \u3609 \u3623 \u3603 \u3648 \u3591 \u3636 \u3609 \u3607 \u3633 \u3657 \u3591 \u3627 \u3617 \u3604 \u3586 \u3629 \u3591 \u3649 \u3614 \u3655 \u3585 \u3648 \u3585 \u3592 \u3609 \u3637 \u3657 \u3592 \u3632 \u3606 \u3641 \u3585 \u3648 \u3629 \u3634 \u3629 \u3629 \u3585  \u3588 \u3640 \u3603 \u3605 \u3657 \u3629 \u3591 \u3585 \u3634 \u3619 \u3621 \u3610 \u3592 \u3619 \u3636 \u3591 \u3627 \u3619 \u3639 \u3629 \u3652 \u3617 \u3656 ', () => \{\
+                State.packages = State.packages.filter(p => p.id !== id);\
+                saveStateToStorage();\
+                showToast('\uc0\u55357 \u56785 \u65039  \u3621 \u3610 \u3626 \u3635 \u3648 \u3619 \u3655 \u3592 ');\
+                renderPackages();\
+                populateFormSelectors();\
+            \});\
+        \}\
+\
+        // Package Edit modal opening handler\
+        function openEditPackageModal(id) \{\
+            const p = State.packages.find(item => item.id === id);\
+            if (!p) return;\
+\
+            document.getElementById('package-modal-title').innerText = '\uc0\u55356 \u57335 \u65039  \u3649 \u3585 \u3657 \u3652 \u3586 \u3629 \u3633 \u3605 \u3619 \u3634 \u3588 \u3656 \u3634 \u3610 \u3619 \u3636 \u3585 \u3634 \u3619 ';\
+            document.getElementById('package-form-id').value = p.id;\
+            document.getElementById('package-name').value = p.name;\
+            document.getElementById('package-type').value = p.type;\
+            document.getElementById('package-price').value = p.price;\
+            document.getElementById('package-detail').value = p.detail;\
+\
+            document.getElementById('package-modal').classList.remove('hidden');\
+        \}\
+\
+        // Live auto-calculation in Queue Modal\
+        function calculateQueueAmounts() \{\
+            const pkgId = document.getElementById('queue-package-id').value;\
+            const qty = parseInt(document.getElementById('queue-question-count').value) || 1;\
+            const pkg = State.packages.find(p => p.id === pkgId);\
+            \
+            if (pkg) \{\
+                const totalPrice = pkg.price * qty;\
+                document.getElementById('queue-total-price').value = totalPrice;\
+                \
+                const payStatus = document.getElementById('queue-payment-status').value;\
+                let paidAmountInput = document.getElementById('queue-paid-amount');\
+                \
+                if (payStatus === '\uc0\u3594 \u3635 \u3619 \u3632 \u3588 \u3619 \u3610 \u3649 \u3621 \u3657 \u3623 ') \{\
+                    paidAmountInput.value = totalPrice;\
+                \} else if (payStatus === '\uc0\u3618 \u3633 \u3591 \u3652 \u3617 \u3656 \u3594 \u3635 \u3619 \u3632 ') \{\
+                    paidAmountInput.value = 0;\
+                \}\
+\
+                const paidAmount = parseFloat(paidAmountInput.value) || 0;\
+                document.getElementById('queue-remaining-balance').innerText = totalPrice - paidAmount;\
+            \}\
+        \}\
+\
+        // Open editing overlay for queue entry\
+        function openEditQueueModal(id) \{\
+            const q = State.queues.find(item => item.id === id);\
+            if (!q) return;\
+\
+            document.getElementById('queue-modal-title').innerText = `\uc0\u9999 \u65039  \u3649 \u3585 \u3657 \u3652 \u3586 \u3588 \u3636 \u3623 \u3621 \u3641 \u3585 \u3604 \u3623 \u3591  ($\{q.queueCode\})`;\
+            document.getElementById('queue-form-id').value = q.id;\
+            document.getElementById('queue-form-code').value = q.queueCode;\
+            document.getElementById('queue-nickname').value = q.nickname;\
+            document.getElementById('queue-fullname').value = q.fullname || '';\
+            document.getElementById('queue-age').value = q.age || '';\
+            document.getElementById('queue-gender').value = q.gender || '\uc0\u3627 \u3597 \u3636 \u3591 ';\
+            document.getElementById('queue-contact-channel').value = q.contactChannel;\
+            document.getElementById('queue-contact-account').value = q.contactAccount;\
+            document.getElementById('queue-profile-link').value = q.profileLink || '';\
+            document.getElementById('queue-teller-id').value = q.tellerId;\
+            document.getElementById('queue-package-id').value = q.packageId;\
+            document.getElementById('queue-question-count').value = q.questionCount || 1;\
+            document.getElementById('queue-total-price').value = q.totalPrice;\
+            document.getElementById('queue-payment-status').value = q.paymentStatus;\
+            document.getElementById('queue-paid-amount').value = q.paidAmount;\
+            document.getElementById('queue-est-date').value = q.estDate;\
+            document.getElementById('queue-est-time').value = q.estTime || '20:00';\
+            document.getElementById('queue-job-status').value = q.jobStatus;\
+            document.getElementById('queue-questions').value = q.questions;\
+            document.getElementById('queue-notes').value = q.notes || '';\
+\
+            calculateQueueAmounts();\
+            document.getElementById('queue-modal').classList.remove('hidden');\
+        \}\
+\
+        // Delete specific queue from dashboard or card\
+        function deleteQueue(id) \{\
+            openConfirmDialog('\uc0\u9888 \u65039  \u3588 \u3640 \u3603 \u3605 \u3657 \u3629 \u3591 \u3585 \u3634 \u3619 \u3621 \u3610 \u3588 \u3636 \u3623 \u3609 \u3637 \u3657 \u3627 \u3619 \u3639 \u3629 \u3652 \u3617 \u3656 ?', '\u3611 \u3619 \u3632 \u3623 \u3633 \u3605 \u3636  \u3586 \u3657 \u3629 \u3617 \u3641 \u3621 \u3649 \u3621 \u3632 \u3588 \u3635 \u3606 \u3634 \u3617 \u3607 \u3633 \u3657 \u3591 \u3627 \u3617 \u3604 \u3586 \u3629 \u3591 \u3588 \u3636 \u3623 \u3609 \u3637 \u3657 \u3592 \u3632 \u3606 \u3641 \u3585 \u3609 \u3635 \u3629 \u3629 \u3585 \u3592 \u3634 \u3585 \u3619 \u3632 \u3610 \u3610 \u3629 \u3618 \u3656 \u3634 \u3591 \u3606 \u3634 \u3623 \u3619 ', () => \{\
+                State.queues = State.queues.filter(q => q.id !== id);\
+                saveStateToStorage();\
+                showToast('\uc0\u55357 \u56785 \u65039  \u3621 \u3610 \u3626 \u3635 \u3648 \u3619 \u3655 \u3592 ');\
+                renderQueues();\
+                if (State.currentPage === 'dashboard') renderDashboard();\
+            \});\
+        \}\
+\
+        // Customer profile display modal handler\
+        function openCustomerProfileById(queueId) \{\
+            const q = State.queues.find(item => item.id === queueId);\
+            if (!q) return;\
+\
+            const nameToSearch = q.fullname || q.nickname;\
+            const history = State.queues.filter(item => (item.fullname || item.nickname) === nameToSearch);\
+            const totalSpent = history.reduce((sum, item) => sum + (parseFloat(item.paidAmount) || 0), 0);\
+\
+            // Populate data inside Profile modal\
+            document.getElementById('prof-nickname').innerText = `\uc0\u3588 \u3640 \u3603  $\{q.nickname\}`;\
+            document.getElementById('prof-details').innerText = `\uc0\u3594 \u3639 \u3656 \u3629 \u3592 \u3619 \u3636 \u3591 : $\{q.fullname || '\u3652 \u3617 \u3656 \u3621 \u3591 \u3594 \u3639 \u3656 \u3629 \u3592 \u3619 \u3636 \u3591 '\} \'95 \u3629 \u3634 \u3618 \u3640 : $\{q.age || '\u3652 \u3617 \u3656 \u3619 \u3632 \u3610 \u3640 '\} \'95 \u3648 \u3614 \u3624 : $\{q.gender || '\u3652 \u3617 \u3656 \u3619 \u3632 \u3610 \u3640 '\}`;\
+            document.getElementById('prof-contact').innerText = `\uc0\u3594 \u3656 \u3629 \u3591 \u3607 \u3634 \u3591 \u3605 \u3636 \u3604 \u3605 \u3656 \u3629 : $\{q.contactChannel\} ($\{q.contactAccount\})`;\
+            \
+            const linkBtn = document.getElementById('prof-link-element');\
+            if (q.profileLink) \{\
+                linkBtn.href = q.profileLink;\
+                linkBtn.classList.remove('hidden');\
+            \} else \{\
+                linkBtn.classList.add('hidden');\
+            \}\
+\
+            document.getElementById('prof-total-visits').innerText = history.length;\
+            document.getElementById('prof-total-spent').innerText = `$\{totalSpent.toLocaleString()\} \uc0\u3647 `;\
+\
+            // Dynamic history checklist renderer\
+            const listContainer = document.getElementById('prof-history-list-container');\
+            listContainer.innerHTML = history.map(h => \{\
+                const t = State.tellers.find(teller => teller.id === h.tellerId);\
+                const p = State.packages.find(pkg => pkg.id === h.packageId);\
+                return `\
+                    <div class="p-4 rounded-2xl border border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/40">\
+                        <div class="flex justify-between items-center">\
+                            <span class="font-mono text-[10px] font-bold bg-zinc-200 dark:bg-zinc-800 px-2 py-0.5 rounded text-zinc-700 dark:text-zinc-300">\
+                                $\{h.queueCode\}\
+                            </span>\
+                            <div class="flex gap-1.5 text-[9px] font-bold">\
+                                <span class="px-2 py-0.5 rounded $\{h.jobStatus === '\uc0\u3626 \u3656 \u3591 \u3588 \u3635 \u3607 \u3635 \u3609 \u3634 \u3618 \u3649 \u3621 \u3657 \u3623 ' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-amber-100 text-amber-800'\}">\
+                                    $\{h.jobStatus\}\
+                                </span>\
+                                <span class="bg-purple-100 text-purple-800 dark:bg-purple-950 dark:text-purple-300 px-2 py-0.5 rounded">\
+                                    \uc0\u3592 \u3656 \u3634 \u3618 \u3649 \u3621 \u3657 \u3623  $\{h.paidAmount\} / $\{h.totalPrice\} \u3610 .\
+                                </span>\
+                            </div>\
+                        </div>\
+\
+                        <div class="mt-3">\
+                            <p class="font-bold text-zinc-700 dark:text-zinc-200">\
+                                $\{p ? p.name : '\uc0\u3610 \u3619 \u3636 \u3585 \u3634 \u3619 \u3649 \u3610 \u3610 \u3619 \u3632 \u3610 \u3640 \u3588 \u3623 \u3634 \u3617 \u3605 \u3657 \u3629 \u3591 \u3585 \u3634 \u3619 '\} (\u3614 \u3618 \u3634 \u3585 \u3619 \u3603 \u3660 \u3650 \u3604 \u3618 : $\{t ? t.name : '\u3652 \u3617 \u3656 \u3619 \u3632 \u3610 \u3640 '\})\
+                            </p>\
+                            <div class="mt-2 p-2.5 rounded-xl bg-white dark:bg-zinc-950 italic text-zinc-500 dark:text-zinc-400">\
+                                "$\{h.questions\}"\
+                            </div>\
+                        </div>\
+\
+                        $\{h.notes ? `<p class="text-[10px] text-zinc-400 mt-2 font-medium">\uc0\u55357 \u56524  \u3610 \u3633 \u3609 \u3607 \u3638 \u3585 \u3594 \u3656 \u3623 \u3618 \u3592 \u3635 \u3648 \u3614 \u3636 \u3656 \u3617 \u3648 \u3605 \u3636 \u3617 : $\{h.notes\}</p>` : ''\}\
+\
+                        <div class="mt-3 pt-2 border-t border-zinc-100 dark:border-zinc-800 text-[10px] text-zinc-400 flex justify-between">\
+                            <span>\uc0\u3592 \u3629 \u3591 \u3648 \u3617 \u3639 \u3656 \u3629 : $\{new Date(h.createdAt).toLocaleDateString('th-TH', \{ year: 'numeric', month: 'short', day: 'numeric' \})\}</span>\
+                            <span>\uc0\u3585 \u3635 \u3627 \u3609 \u3604 \u3609 \u3633 \u3604 \u3626 \u3656 \u3591 \u3617 \u3629 \u3610 : $\{h.estDate\} ($\{h.estTime\})</span>\
+                        </div>\
+                    </div>\
+                `;\
+            \}).join('');\
+\
+            // Store profile target for Delete-all Action\
+            document.getElementById('prof-delete-all-btn').onclick = () => \{\
+                openConfirmDialog('\uc0\u55357 \u56785 \u65039  \u3618 \u3639 \u3609 \u3618 \u3633 \u3609 \u3621 \u3610 \u3586 \u3657 \u3629 \u3617 \u3641 \u3621 \u3607 \u3633 \u3657 \u3591 \u3627 \u3617 \u3604 ?', `\u3611 \u3619 \u3632 \u3623 \u3633 \u3605 \u3636 \u3585 \u3634 \u3619 \u3651 \u3594 \u3657 \u3610 \u3619 \u3636 \u3585 \u3634 \u3619  \u3588 \u3636 \u3623  \u3649 \u3621 \u3632 \u3619 \u3634 \u3618 \u3621 \u3632 \u3648 \u3629 \u3637 \u3618 \u3604 \u3607 \u3633 \u3657 \u3591 \u3627 \u3617 \u3604 \u3586 \u3629 \u3591 \u3588 \u3640 \u3603  $\{q.nickname\} \u3592 \u3632 \u3606 \u3641 \u3585 \u3621 \u3610 \u3629 \u3629 \u3585 \u3629 \u3618 \u3656 \u3634 \u3591 \u3606 \u3634 \u3623 \u3619 \u3592 \u3634 \u3585 \u3600 \u3634 \u3609 \u3586 \u3657 \u3629 \u3617 \u3641 \u3621 `, () => \{\
+                    State.queues = State.queues.filter(item => (item.fullname || item.nickname) !== nameToSearch);\
+                    saveStateToStorage();\
+                    showToast('\uc0\u55357 \u56785 \u65039  \u3621 \u3610 \u3626 \u3635 \u3648 \u3619 \u3655 \u3592 ');\
+                    document.getElementById('customer-profile-modal').classList.add('hidden');\
+                    renderQueues();\
+                    if (State.currentPage === 'dashboard') renderDashboard();\
+                \});\
+            \};\
+\
+            document.getElementById('customer-profile-modal').classList.remove('hidden');\
+        \}\
+\
+        // Helper to visual select avatar emoji\
+        function selectAvatarEmoji(emoji) \{\
+            document.getElementById('teller-avatar-input').value = emoji;\
+            document.querySelectorAll('.teller-avatar-btn').forEach(btn => \{\
+                if (btn.innerText === emoji) \{\
+                    btn.classList.add('border-purple-600', 'bg-purple-500/10', 'scale-105', 'font-bold');\
+                \} else \{\
+                    btn.classList.remove('border-purple-600', 'bg-purple-500/10', 'scale-105', 'font-bold');\
+                \}\
+            \});\
+        \}\
+\
+        // Initialize Global Event Listeners\
+        document.addEventListener("DOMContentLoaded", () => \{\
+            \
+            // Populate Avatar Buttons\
+            const avatarGrid = document.getElementById('teller-avatar-grid');\
+            const emojis = ['\uc0\u55357 \u56622 ', '\u10024 ', '\u55356 \u57113 ', '\u55356 \u57100 ', '\u55356 \u56527 ', '\u55357 \u56687 \u65039 '];\
+            avatarGrid.innerHTML = emojis.map(emoji => `\
+                <button type="button" class="teller-avatar-btn w-10 h-10 rounded-xl text-lg flex items-center justify-center border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-all">\
+                    $\{emoji\}\
+                </button>\
+            `).join('');\
+\
+            document.querySelectorAll('.teller-avatar-btn').forEach(btn => \{\
+                btn.addEventListener('click', (e) => \{\
+                    selectAvatarEmoji(e.target.innerText.trim());\
+                \});\
+            \});\
+\
+            // Populate Form Selectors\
+            populateFormSelectors();\
+\
+            // Render active Page on load\
+            navigateToPage('dashboard');\
+\
+            // Set Dark Mode visual classes on DOM\
+            if (State.darkMode) \{\
+                document.documentElement.classList.add('dark');\
+            \} else \{\
+                document.documentElement.classList.remove('dark');\
+            \}\
+\
+            // Dark Mode Toggler\
+            document.getElementById('dark-mode-toggle').addEventListener('click', () => \{\
+                State.darkMode = !State.darkMode;\
+                localStorage.setItem('tarot_dark_mode', State.darkMode);\
+                document.documentElement.classList.toggle('dark', State.darkMode);\
+                showToast(State.darkMode ? '\uc0\u55356 \u57113  \u3648 \u3611 \u3636 \u3604 \u3651 \u3594 \u3657 \u3591 \u3634 \u3609 \u3650 \u3627 \u3617 \u3604 \u3585 \u3621 \u3634 \u3591 \u3588 \u3639 \u3609 ' : '\u9728 \u65039  \u3648 \u3611 \u3636 \u3604 \u3651 \u3594 \u3657 \u3591 \u3634 \u3609 \u3650 \u3627 \u3617 \u3604 \u3585 \u3621 \u3634 \u3591 \u3623 \u3633 \u3609 ');\
+            \});\
+\
+            // Nav Tab Clicks\
+            document.querySelectorAll('.nav-tab-btn').forEach(btn => \{\
+                btn.addEventListener('click', (e) => \{\
+                    const tabId = e.currentTarget.getAttribute('data-tab');\
+                    navigateToPage(tabId);\
+                \});\
+            \});\
+\
+            // Admin / Teller view switches\
+            const adminBtn = document.getElementById('role-admin-btn');\
+            const tellerBtn = document.getElementById('role-teller-btn');\
+            \
+            adminBtn.addEventListener('click', () => \{\
+                State.currentRole = 'Admin';\
+                adminBtn.className = 'px-3 py-1.5 rounded-lg transition-all bg-purple-600 text-white shadow-sm';\
+                tellerBtn.className = 'px-3 py-1.5 rounded-lg transition-all text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-100';\
+                \
+                // Show Admin Navigation Tabs\
+                document.querySelectorAll('.admin-only').forEach(el => el.classList.remove('hidden'));\
+                document.getElementById('filter-teller-container').classList.remove('hidden');\
+                document.getElementById('role-badge-info').innerText = '\uc0\u9889  \u3626 \u3636 \u3607 \u3608 \u3636 \u3660 \u3649 \u3629 \u3604 \u3617 \u3636 \u3609 \u3619 \u3632 \u3610 \u3610 \u3627 \u3621 \u3633 \u3585 ';\
+\
+                showToast('\uc0\u55357 \u56401  \u3626 \u3621 \u3633 \u3610 \u3648 \u3611 \u3655 \u3609 \u3617 \u3640 \u3617 \u3617 \u3629 \u3591  Admin');\
+                navigateToPage(State.currentPage);\
+            \});\
+\
+            tellerBtn.addEventListener('click', () => \{\
+                State.currentRole = 'FortuneTeller';\
+                tellerBtn.className = 'px-3 py-1.5 rounded-lg transition-all bg-purple-600 text-white shadow-sm';\
+                adminBtn.className = 'px-3 py-1.5 rounded-lg transition-all text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-100';\
+                \
+                // Hide Admin Navigation Tabs\
+                document.querySelectorAll('.admin-only').forEach(el => el.classList.add('hidden'));\
+                document.getElementById('filter-teller-container').classList.add('hidden');\
+                \
+                if (State.currentPage === 'tellers' || State.currentPage === 'packages') \{\
+                    navigateToPage('dashboard');\
+                \} else \{\
+                    navigateToPage(State.currentPage);\
+                \}\
+\
+                if (State.tellers.length > 0 && !State.currentTellerUser) \{\
+                    State.currentTellerUser = State.tellers[0];\
+                \}\
+                \
+                document.getElementById('role-badge-info').innerText = `\uc0\u55357 \u56622  \u3650 \u3627 \u3617 \u3604 \u3649 \u3617 \u3656 \u3627 \u3617 \u3629 : $\{State.currentTellerUser ? State.currentTellerUser.name : '\u3652 \u3617 \u3656 \u3619 \u3632 \u3610 \u3640 '\}`;\
+                showToast(`\uc0\u55357 \u56622  \u3626 \u3621 \u3633 \u3610 \u3648 \u3611 \u3655 \u3609 \u3617 \u3640 \u3617 \u3617 \u3629 \u3591  \u3649 \u3617 \u3656 \u3627 \u3617 \u3629 : $\{State.currentTellerUser ? State.currentTellerUser.name : '\u3652 \u3617 \u3656 \u3619 \u3632 \u3610 \u3640 '\}`);\
+                renderDashboard();\
+            \});\
+\
+            // Fortune Teller active dropdown change handler\
+            document.getElementById('header-teller-selector').addEventListener('change', (e) => \{\
+                const selected = State.tellers.find(t => t.id === e.target.value);\
+                State.currentTellerUser = selected;\
+                document.getElementById('role-badge-info').innerText = `\uc0\u55357 \u56622  \u3650 \u3627 \u3617 \u3604 \u3649 \u3617 \u3656 \u3627 \u3617 \u3629 : $\{selected ? selected.name : '\u3652 \u3617 \u3656 \u3619 \u3632 \u3610 \u3640 '\}`;\
+                showToast(`\uc0\u55357 \u56622  \u3626 \u3621 \u3633 \u3610 \u3649 \u3617 \u3656 \u3627 \u3617 \u3629 \u3648 \u3611 \u3655 \u3609 : $\{selected ? selected.name : '\u3652 \u3617 \u3656 \u3619 \u3632 \u3610 \u3640 '\}`);\
+                navigateToPage(State.currentPage);\
+            \});\
+\
+            // Event bindings for automatic calculation inside Queue Form\
+            document.getElementById('queue-package-id').addEventListener('change', calculateQueueAmounts);\
+            document.getElementById('queue-question-count').addEventListener('input', calculateQueueAmounts);\
+            document.getElementById('queue-payment-status').addEventListener('change', calculateQueueAmounts);\
+            document.getElementById('queue-paid-amount').addEventListener('input', () => \{\
+                const total = parseFloat(document.getElementById('queue-total-price').value) || 0;\
+                const paid = parseFloat(document.getElementById('queue-paid-amount').value) || 0;\
+                document.getElementById('queue-remaining-balance').innerText = total - paid;\
+            \});\
+\
+            // Draft Recovery check logic on load\
+            const savedDraft = localStorage.getItem('tarot_draft_queue');\
+            if (savedDraft) \{\
+                document.getElementById('dash-restore-draft-btn').classList.remove('hidden');\
+            \}\
+\
+            // Dashboard Restore Draft action\
+            document.getElementById('dash-restore-draft-btn').addEventListener('click', () => \{\
+                const saved = localStorage.getItem('tarot_draft_queue');\
+                if (saved) \{\
+                    try \{\
+                        const parsed = JSON.parse(saved);\
+                        \
+                        document.getElementById('queue-modal-title').innerText = '\uc0\u55358 \u56793 \u8205 \u9792 \u65039  \u3650 \u3627 \u3621 \u3604 \u3588 \u3636 \u3623 \u3619 \u3656 \u3634 \u3591 \u3621 \u3656 \u3634 \u3626 \u3640 \u3604 \u3626 \u3635 \u3648 \u3619 \u3655 \u3592 ';\
+                        document.getElementById('queue-form-id').value = '';\
+                        document.getElementById('queue-form-code').value = '';\
+                        document.getElementById('queue-nickname').value = parsed.nickname || '';\
+                        document.getElementById('queue-fullname').value = parsed.fullname || '';\
+                        document.getElementById('queue-age').value = parsed.age || '';\
+                        document.getElementById('queue-gender').value = parsed.gender || '\uc0\u3627 \u3597 \u3636 \u3591 ';\
+                        document.getElementById('queue-contact-channel').value = parsed.contactChannel || 'LINE';\
+                        document.getElementById('queue-contact-account').value = parsed.contactAccount || '';\
+                        document.getElementById('queue-profile-link').value = parsed.profileLink || '';\
+                        document.getElementById('queue-teller-id').value = parsed.tellerId || '';\
+                        document.getElementById('queue-package-id').value = parsed.packageId || '';\
+                        document.getElementById('queue-question-count').value = parsed.questionCount || 1;\
+                        document.getElementById('queue-total-price').value = parsed.totalPrice || 0;\
+                        document.getElementById('queue-payment-status').value = parsed.paymentStatus || '\uc0\u3618 \u3633 \u3591 \u3652 \u3617 \u3656 \u3594 \u3635 \u3619 \u3632 ';\
+                        document.getElementById('queue-paid-amount').value = parsed.paidAmount || 0;\
+                        document.getElementById('queue-est-date').value = parsed.estDate || '';\
+                        document.getElementById('queue-est-time').value = parsed.estTime || '20:00';\
+                        document.getElementById('queue-job-status').value = parsed.jobStatus || '\uc0\u3619 \u3629 \u3594 \u3635 \u3619 \u3632 \u3648 \u3591 \u3636 \u3609 ';\
+                        document.getElementById('queue-questions').value = parsed.questions || '';\
+                        document.getElementById('queue-notes').value = parsed.notes || '';\
+\
+                        calculateQueueAmounts();\
+                        document.getElementById('queue-modal').classList.remove('hidden');\
+                        showToast('\uc0\u55357 \u56510  \u3650 \u3627 \u3621 \u3604 \u3586 \u3657 \u3629 \u3617 \u3641 \u3621 \u3619 \u3656 \u3634 \u3591 \u3607 \u3637 \u3656 \u3610 \u3633 \u3609 \u3607 \u3638 \u3585 \u3652 \u3623 \u3657 \u3629 \u3633 \u3605 \u3650 \u3609 \u3617 \u3633 \u3605 \u3636 \u3649 \u3621 \u3657 \u3623 ');\
+                    \} catch (e) \{\
+                        localStorage.removeItem('tarot_draft_queue');\
+                    \}\
+                \}\
+            \});\
+\
+            // Local draft change tracker for Auto-save\
+            const autoSaveFields = ['queue-nickname', 'queue-fullname', 'queue-age', 'queue-gender', 'queue-contact-channel', 'queue-contact-account', 'queue-profile-link', 'queue-teller-id', 'queue-package-id', 'queue-question-count', 'queue-total-price', 'queue-payment-status', 'queue-paid-amount', 'queue-est-date', 'queue-est-time', 'queue-job-status', 'queue-questions', 'queue-notes'];\
+            autoSaveFields.forEach(id => \{\
+                document.getElementById(id).addEventListener('input', () => \{\
+                    const editId = document.getElementById('queue-form-id').value;\
+                    if (!editId) \{\
+                        const currentFormValues = \{\
+                            nickname: document.getElementById('queue-nickname').value,\
+                            fullname: document.getElementById('queue-fullname').value,\
+                            age: document.getElementById('queue-age').value,\
+                            gender: document.getElementById('queue-gender').value,\
+                            contactChannel: document.getElementById('queue-contact-channel').value,\
+                            contactAccount: document.getElementById('queue-contact-account').value,\
+                            profileLink: document.getElementById('queue-profile-link').value,\
+                            tellerId: document.getElementById('queue-teller-id').value,\
+                            packageId: document.getElementById('queue-package-id').value,\
+                            questionCount: document.getElementById('queue-question-count').value,\
+                            totalPrice: document.getElementById('queue-total-price').value,\
+                            paymentStatus: document.getElementById('queue-payment-status').value,\
+                            paidAmount: document.getElementById('queue-paid-amount').value,\
+                            estDate: document.getElementById('queue-est-date').value,\
+                            estTime: document.getElementById('queue-est-time').value,\
+                            jobStatus: document.getElementById('queue-job-status').value,\
+                            questions: document.getElementById('queue-questions').value,\
+                            notes: document.getElementById('queue-notes').value,\
+                        \};\
+                        localStorage.setItem('tarot_draft_queue', JSON.stringify(currentFormValues));\
+                        document.getElementById('dash-restore-draft-btn').classList.remove('hidden');\
+                    \}\
+                \});\
+            \});\
+\
+            // Open Modal triggers\
+            document.getElementById('dash-add-queue-btn').addEventListener('click', () => openNewQueueModal());\
+            document.getElementById('page-add-queue-btn').addEventListener('click', () => openNewQueueModal());\
+            document.getElementById('empty-state-add-btn').addEventListener('click', () => openNewQueueModal());\
+            \
+            document.getElementById('add-teller-btn').addEventListener('click', () => \{\
+                document.getElementById('teller-modal-title').innerText = '\uc0\u55357 \u56622  \u3648 \u3614 \u3636 \u3656 \u3617 \u3649 \u3617 \u3656 \u3627 \u3617 \u3629 \u3614 \u3618 \u3634 \u3585 \u3619 \u3603 \u3660 \u3588 \u3609 \u3651 \u3627 \u3617 \u3656 ';\
+                document.getElementById('teller-form-id').value = '';\
+                document.getElementById('teller-form').reset();\
+                selectAvatarEmoji('\uc0\u55357 \u56622 ');\
+                document.getElementById('teller-modal').classList.remove('hidden');\
+            \});\
+\
+            document.getElementById('add-package-btn').addEventListener('click', () => \{\
+                document.getElementById('package-modal-title').innerText = '\uc0\u55356 \u57335 \u65039  \u3648 \u3614 \u3636 \u3656 \u3617 \u3649 \u3614 \u3655 \u3585 \u3648 \u3585 \u3592 \u3619 \u3634 \u3588 \u3634 \u3619 \u3633 \u3610 \u3588 \u3636 \u3623 ';\
+                document.getElementById('package-form-id').value = '';\
+                document.getElementById('package-form').reset();\
+                document.getElementById('package-modal').classList.remove('hidden');\
+            \});\
+\
+            // Universal modal close listeners\
+            document.querySelectorAll('.modal-close-btn').forEach(btn => \{\
+                btn.addEventListener('click', (e) => \{\
+                    const modalId = e.currentTarget.getAttribute('data-modal');\
+                    document.getElementById(modalId).classList.add('hidden');\
+                \});\
+            \});\
+\
+            // Confirm Dialog Controls\
+            document.getElementById('confirm-cancel-btn').addEventListener('click', closeConfirmDialog);\
+            document.getElementById('confirm-ok-btn').addEventListener('click', () => \{\
+                if (confirmAction) confirmAction();\
+                closeConfirmDialog();\
+            \});\
+\
+            // Clear filter button listener\
+            document.getElementById('clear-filters-btn').addEventListener('click', () => \{\
+                document.getElementById('queue-search').value = '';\
+                document.getElementById('filter-status').value = 'all';\
+                document.getElementById('filter-payment').value = 'all';\
+                document.getElementById('filter-teller').value = 'all';\
+                document.getElementById('filter-date').value = '';\
+\
+                State.searchQuery = '';\
+                State.filterStatus = 'all';\
+                State.filterPayment = 'all';\
+                State.filterTeller = 'all';\
+                State.filterDate = '';\
+                State.currentPageNum = 1;\
+                renderQueues();\
+            \});\
+\
+            // Filter key listeners\
+            document.getElementById('queue-search').addEventListener('input', (e) => \{\
+                State.searchQuery = e.target.value;\
+                State.currentPageNum = 1;\
+                renderQueues();\
+            \});\
+            document.getElementById('filter-status').addEventListener('change', (e) => \{\
+                State.filterStatus = e.target.value;\
+                State.currentPageNum = 1;\
+                renderQueues();\
+            \});\
+            document.getElementById('filter-payment').addEventListener('change', (e) => \{\
+                State.filterPayment = e.target.value;\
+                State.currentPageNum = 1;\
+                renderQueues();\
+            \});\
+            document.getElementById('filter-teller').addEventListener('change', (e) => \{\
+                State.filterTeller = e.target.value;\
+                State.currentPageNum = 1;\
+                renderQueues();\
+            \});\
+            document.getElementById('filter-date').addEventListener('change', (e) => \{\
+                State.filterDate = e.target.value;\
+                State.currentPageNum = 1;\
+                renderQueues();\
+            \});\
+\
+            // Pagination button listeners\
+            document.getElementById('pagination-prev-btn').addEventListener('click', () => \{\
+                if (State.currentPageNum > 1) \{\
+                    State.currentPageNum--;\
+                    renderQueues();\
+                \}\
+            \});\
+            document.getElementById('pagination-next-btn').addEventListener('click', () => \{\
+                const filteredCount = State.queues.length; // Approximate\
+                const totalPages = Math.ceil(filteredCount / State.itemsPerPage);\
+                if (State.currentPageNum < totalPages) \{\
+                    State.currentPageNum++;\
+                    renderQueues();\
+                \}\
+            \});\
+\
+            document.getElementById('view-all-queues-shortcut').addEventListener('click', () => \{\
+                navigateToPage('queues');\
+            \});\
+\
+            // Teller form submit listener\
+            document.getElementById('teller-form').addEventListener('submit', (e) => \{\
+                e.preventDefault();\
+                const id = document.getElementById('teller-form-id').value;\
+                const name = document.getElementById('teller-name').value.trim();\
+                const pageName = document.getElementById('teller-page-name').value.trim();\
+                const tel = document.getElementById('teller-tel').value.trim();\
+                const contact = document.getElementById('teller-contact').value.trim();\
+                const status = document.getElementById('teller-status').value;\
+                const avatar = document.getElementById('teller-avatar-input').value;\
+\
+                // Simple validation\
+                let hasError = false;\
+                if (!name) \{\
+                    document.getElementById('teller-name-error').innerText = '\uc0\u3585 \u3619 \u3640 \u3603 \u3634 \u3585 \u3619 \u3629 \u3585 \u3594 \u3639 \u3656 \u3629 \u3648 \u3621 \u3656 \u3609 \u3649 \u3617 \u3656 \u3627 \u3617 \u3629 ';\
+                    document.getElementById('teller-name-error').classList.remove('hidden');\
+                    hasError = true;\
+                \} else \{\
+                    document.getElementById('teller-name-error').classList.add('hidden');\
+                \}\
+\
+                if (!pageName) \{\
+                    document.getElementById('teller-page-error').innerText = '\uc0\u3585 \u3619 \u3640 \u3603 \u3634 \u3585 \u3619 \u3629 \u3585 \u3594 \u3639 \u3656 \u3629 \u3627 \u3609 \u3657 \u3634 \u3648 \u3614 \u3592 ';\
+                    document.getElementById('teller-page-error').classList.remove('hidden');\
+                    hasError = true;\
+                \} else \{\
+                    document.getElementById('teller-page-error').classList.add('hidden');\
+                \}\
+\
+                if (!tel) \{\
+                    document.getElementById('teller-tel-error').innerText = '\uc0\u3585 \u3619 \u3640 \u3603 \u3634 \u3585 \u3619 \u3629 \u3585 \u3648 \u3610 \u3629 \u3619 \u3660 \u3650 \u3607 \u3619 \u3624 \u3633 \u3614 \u3607 \u3660 ';\
+                    document.getElementById('teller-tel-error').classList.remove('hidden');\
+                    hasError = true;\
+                \} else \{\
+                    document.getElementById('teller-tel-error').classList.add('hidden');\
+                \}\
+\
+                if (hasError) return;\
+\
+                const formData = \{ name, pageName, tel, contact, status, avatar \};\
+\
+                if (id) \{\
+                    // Update existing\
+                    State.tellers = State.tellers.map(t => t.id === id ? \{ ...t, ...formData \} : t);\
+                    showToast('\uc0\u9989  \u3649 \u3585 \u3657 \u3652 \u3586 \u3626 \u3635 \u3648 \u3619 \u3655 \u3592 ');\
+                \} else \{\
+                    // Create new\
+                    const newId = 't_' + Date.now();\
+                    State.tellers.push(\{ id: newId, ...formData \});\
+                    showToast('\uc0\u9989  \u3610 \u3633 \u3609 \u3607 \u3638 \u3585 \u3626 \u3635 \u3648 \u3619 \u3655 \u3592 ');\
+                \}\
+\
+                saveStateToStorage();\
+                document.getElementById('teller-modal').classList.add('hidden');\
+                renderTellers();\
+                populateFormSelectors();\
+            \});\
+\
+            // Package form submit listener\
+            document.getElementById('package-form').addEventListener('submit', (e) => \{\
+                e.preventDefault();\
+                const id = document.getElementById('package-form-id').value;\
+                const name = document.getElementById('package-name').value.trim();\
+                const type = document.getElementById('package-type').value;\
+                const price = parseFloat(document.getElementById('package-price').value);\
+                const detail = document.getElementById('package-detail').value.trim();\
+\
+                let hasError = false;\
+                if (!name) \{\
+                    document.getElementById('package-name-error').innerText = '\uc0\u3585 \u3619 \u3640 \u3603 \u3634 \u3585 \u3619 \u3629 \u3585 \u3594 \u3639 \u3656 \u3629 \u3649 \u3614 \u3655 \u3585 \u3648 \u3585 \u3592 ';\
+                    document.getElementById('package-name-error').classList.remove('hidden');\
+                    hasError = true;\
+                \} else \{\
+                    document.getElementById('package-name-error').classList.add('hidden');\
+                \}\
+\
+                if (isNaN(price) || price < 0) \{\
+                    document.getElementById('package-price-error').innerText = '\uc0\u3585 \u3619 \u3640 \u3603 \u3634 \u3585 \u3619 \u3629 \u3585 \u3619 \u3634 \u3588 \u3634 \u3651 \u3627 \u3657 \u3606 \u3641 \u3585 \u3605 \u3657 \u3629 \u3591 ';\
+                    document.getElementById('package-price-error').classList.remove('hidden');\
+                    hasError = true;\
+                \} else \{\
+                    document.getElementById('package-price-error').classList.add('hidden');\
+                \}\
+\
+                if (hasError) return;\
+\
+                const formData = \{ name, type, price, detail \};\
+\
+                if (id) \{\
+                    State.packages = State.packages.map(p => p.id === id ? \{ ...p, ...formData \} : p);\
+                    showToast('\uc0\u9989  \u3649 \u3585 \u3657 \u3652 \u3586 \u3626 \u3635 \u3648 \u3619 \u3655 \u3592 ');\
+                \} else \{\
+                    const newId = 'p_' + Date.now();\
+                    State.packages.push(\{ id: newId, ...formData \});\
+                    showToast('\uc0\u9989  \u3610 \u3633 \u3609 \u3607 \u3638 \u3585 \u3626 \u3635 \u3648 \u3619 \u3655 \u3592 ');\
+                \}\
+\
+                saveStateToStorage();\
+                document.getElementById('package-modal').classList.add('hidden');\
+                renderPackages();\
+                populateFormSelectors();\
+            \});\
+\
+            // Queue form submit listener\
+            document.getElementById('queue-form').addEventListener('submit', (e) => \{\
+                e.preventDefault();\
+                const id = document.getElementById('queue-form-id').value;\
+                let queueCode = document.getElementById('queue-form-code').value;\
+                const nickname = document.getElementById('queue-nickname').value.trim();\
+                const fullname = document.getElementById('queue-fullname').value.trim();\
+                const age = parseInt(document.getElementById('queue-age').value) || '';\
+                const gender = document.getElementById('queue-gender').value;\
+                const contactChannel = document.getElementById('queue-contact-channel').value;\
+                const contactAccount = document.getElementById('queue-contact-account').value.trim();\
+                const profileLink = document.getElementById('queue-profile-link').value.trim();\
+                const tellerId = document.getElementById('queue-teller-id').value;\
+                const packageId = document.getElementById('queue-package-id').value;\
+                const questionCount = parseInt(document.getElementById('queue-question-count').value) || 1;\
+                const totalPrice = parseFloat(document.getElementById('queue-total-price').value) || 0;\
+                const paymentStatus = document.getElementById('queue-payment-status').value;\
+                const paidAmount = parseFloat(document.getElementById('queue-paid-amount').value) || 0;\
+                const estDate = document.getElementById('queue-est-date').value;\
+                const estTime = document.getElementById('queue-est-time').value;\
+                const jobStatus = document.getElementById('queue-job-status').value;\
+                const questions = document.getElementById('queue-questions').value.trim();\
+                const notes = document.getElementById('queue-notes').value.trim();\
+\
+                let hasError = false;\
+                if (!nickname) \{\
+                    document.getElementById('queue-nickname-error').innerText = '\uc0\u3585 \u3619 \u3640 \u3603 \u3634 \u3585 \u3619 \u3629 \u3585 \u3594 \u3639 \u3656 \u3629 \u3648 \u3621 \u3656 \u3609 \u3621 \u3641 \u3585 \u3604 \u3623 \u3591 ';\
+                    document.getElementById('queue-nickname-error').classList.remove('hidden');\
+                    hasError = true;\
+                \} else \{\
+                    document.getElementById('queue-nickname-error').classList.add('hidden');\
+                \}\
+\
+                if (!contactAccount) \{\
+                    document.getElementById('queue-contact-account-error').innerText = '\uc0\u3585 \u3619 \u3640 \u3603 \u3634 \u3585 \u3619 \u3629 \u3585 \u3610 \u3633 \u3597 \u3594 \u3637 \u3605 \u3636 \u3604 \u3605 \u3656 \u3629 \u3627 \u3619 \u3639 \u3629  Username';\
+                    document.getElementById('queue-contact-account-error').classList.remove('hidden');\
+                    hasError = true;\
+                \} else \{\
+                    document.getElementById('queue-contact-account-error').classList.add('hidden');\
+                \}\
+\
+                if (!questions) \{\
+                    document.getElementById('queue-questions-error').innerText = '\uc0\u3585 \u3619 \u3640 \u3603 \u3634 \u3585 \u3619 \u3629 \u3585 \u3648 \u3619 \u3639 \u3656 \u3629 \u3591 \u3607 \u3637 \u3656 \u3592 \u3632 \u3606 \u3634 \u3617 \u3586 \u3629 \u3591 \u3621 \u3641 \u3585 \u3604 \u3623 \u3591 ';\
+                    document.getElementById('queue-questions-error').classList.remove('hidden');\
+                    hasError = true;\
+                \} else \{\
+                    document.getElementById('queue-questions-error').classList.add('hidden');\
+                \}\
+\
+                // Error validation block checks if database records are zero\
+                if (State.tellers.length === 0) \{\
+                    showToast('\uc0\u9888 \u65039  \u3585 \u3619 \u3640 \u3603 \u3634 \u3648 \u3614 \u3636 \u3656 \u3617 \u3586 \u3657 \u3629 \u3617 \u3641 \u3621 \u3649 \u3617 \u3656 \u3627 \u3617 \u3629 \u3648 \u3586 \u3657 \u3634 \u3626 \u3641 \u3656 \u3619 \u3632 \u3610 \u3610 \u3585 \u3656 \u3629 \u3609 \u3610 \u3633 \u3609 \u3607 \u3638 \u3585 \u3588 \u3636 \u3623 ', 'error');\
+                    hasError = true;\
+                \}\
+                if (State.packages.length === 0) \{\
+                    showToast('\uc0\u9888 \u65039  \u3585 \u3619 \u3640 \u3603 \u3634 \u3648 \u3614 \u3636 \u3656 \u3617 \u3586 \u3657 \u3629 \u3617 \u3641 \u3621 \u3649 \u3614 \u3655 \u3585 \u3648 \u3585 \u3592 \u3619 \u3634 \u3588 \u3634 \u3585 \u3656 \u3629 \u3609 \u3610 \u3633 \u3609 \u3607 \u3638 \u3585 \u3588 \u3636 \u3623 ', 'error');\
+                    hasError = true;\
+                \}\
+\
+                if (hasError) return;\
+\
+                // Auto queue numbering NT-XXXXXX logic\
+                if (!id) \{\
+                    const lastNum = State.queues.reduce((max, q) => \{\
+                        const num = parseInt(q.queueCode.replace('NT-', ''), 10);\
+                        return num > max ? num : max;\
+                    \}, 0);\
+                    const nextNum = lastNum + 1;\
+                    queueCode = `NT-$\{String(nextNum).padStart(6, '0')\}`;\
+                \}\
+\
+                const formData = \{\
+                    queueCode, nickname, fullname, age, gender, contactChannel, contactAccount, profileLink,\
+                    tellerId, packageId, questionCount, totalPrice, paymentStatus, paidAmount, estDate, estTime,\
+                    jobStatus, questions, notes,\
+                    createdAt: id ? (State.queues.find(item => item.id === id).createdAt) : new Date().toISOString()\
+                \};\
+\
+                if (id) \{\
+                    State.queues = State.queues.map(q => q.id === id ? \{ ...q, ...formData \} : q);\
+                    showToast('\uc0\u9989  \u3649 \u3585 \u3657 \u3652 \u3586 \u3626 \u3635 \u3648 \u3619 \u3655 \u3592 ');\
+                \} else \{\
+                    const newId = 'q_' + Date.now();\
+                    State.queues.unshift(\{ id: newId, ...formData \});\
+                    showToast('\uc0\u9989  \u3610 \u3633 \u3609 \u3607 \u3638 \u3585 \u3626 \u3635 \u3648 \u3619 \u3655 \u3592 ');\
+                    localStorage.removeItem('tarot_draft_queue');\
+                    document.getElementById('dash-restore-draft-btn').classList.add('hidden');\
+                \}\
+\
+                saveStateToStorage();\
+                document.getElementById('queue-modal').classList.add('hidden');\
+                navigateToPage(State.currentPage);\
+            \});\
+        \});\
+\
+        // Open clean blank queue form\
+        function openNewQueueModal() \{\
+            document.getElementById('queue-modal-title').innerText = '\uc0\u55358 \u56793 \u8205 \u9792 \u65039  \u3648 \u3614 \u3636 \u3656 \u3617 \u3611 \u3619 \u3632 \u3623 \u3633 \u3605 \u3636 \u3588 \u3636 \u3623 \u3592 \u3629 \u3591 \u3604 \u3641 \u3604 \u3623 \u3591 \u3586 \u3629 \u3591 \u3621 \u3641 \u3585 \u3604 \u3623 \u3591 ';\
+            document.getElementById('queue-form-id').value = '';\
+            document.getElementById('queue-form-code').value = '';\
+            document.getElementById('queue-form').reset();\
+            \
+            // Default Date ETA: tomorrow\
+            const tomorrow = new Date();\
+            tomorrow.setDate(tomorrow.getDate() + 1);\
+            document.getElementById('queue-est-date').value = tomorrow.toISOString().split('T')[0];\
+            document.getElementById('queue-est-time').value = '20:00';\
+            \
+            // Set default selectors\
+            if (State.tellers.length > 0) document.getElementById('queue-teller-id').value = State.tellers[0].id;\
+            if (State.packages.length > 0) document.getElementById('queue-package-id').value = State.packages[0].id;\
+\
+            calculateQueueAmounts();\
+            document.getElementById('queue-modal').classList.remove('hidden');\
+        \}\
+    </script>\
+</body>\
+</html>}
