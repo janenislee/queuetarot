@@ -813,26 +813,55 @@
 <p class="p1"><span class="Apple-converted-space">            </span>return getThailandLocalDate(dateObj).split('T')[0];</p>
 <p class="p1"><span class="Apple-converted-space">        </span>}</p>
 <p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// --- FIREBASE ENVIRONMENT CONFIGURATION ---</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// =========================================================================</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// ⚙️ คอนฟิกหลักของระบบ FIREBASE<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// =========================================================================</p>
 <p class="p1"><span class="Apple-converted-space">        </span>const appId = typeof __app_id !== 'undefined' ? __app_id : 'tarot-queue-default-app';</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>apiKey: "",</p>
-<p class="p1"><span class="Apple-converted-space">            </span>authDomain: "test-project.firebaseapp.com",</p>
-<p class="p1"><span class="Apple-converted-space">            </span>projectId: "test-project",</p>
-<p class="p1"><span class="Apple-converted-space">            </span>storageBucket: "test-project.appspot.com",</p>
-<p class="p1"><span class="Apple-converted-space">            </span>messagingSenderId: "1234567890",</p>
-<p class="p1"><span class="Apple-converted-space">            </span>appId: "1:1234:web:abcd"</p>
-<p class="p1"><span class="Apple-converted-space">        </span>};</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// ตรวจสอบและดึงการตั้งค่า Firebase จากตัวแปรสภาพแวดล้อมจำลอง (Environment Variables)<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// หากไม่มี (เช่น รันภายนอกโปรแกรมจำลองหรือบน GitHub Pages) จะดึงค่า fallback ด้านล่าง</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let firebaseConfig;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (typeof __firebase_config !== 'undefined' &amp;&amp; __firebase_config) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>firebaseConfig = JSON.parse(__firebase_config);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>} catch (e) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.error("Failed to parse __firebase_config", e);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><span class="Apple-converted-space">        </span></p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (!firebaseConfig) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>firebaseConfig = {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>apiKey: "YOUR_API_KEY_HERE", // ใส่ API Key ของคุณที่นี่สำหรับการรันบน GitHub Pages</p>
+<p class="p1"><span class="Apple-converted-space">                </span>authDomain: "YOUR_PROJECT_ID.firebaseapp.com",</p>
+<p class="p1"><span class="Apple-converted-space">                </span>projectId: "YOUR_PROJECT_ID",</p>
+<p class="p1"><span class="Apple-converted-space">                </span>storageBucket: "YOUR_PROJECT_ID.appspot.com",</p>
+<p class="p1"><span class="Apple-converted-space">                </span>messagingSenderId: "YOUR_SENDER_ID",</p>
+<p class="p1"><span class="Apple-converted-space">                </span>appId: "YOUR_APP_ID"</p>
+<p class="p1"><span class="Apple-converted-space">            </span>};</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
 <p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// Initialize Firebase</p>
-<p class="p1"><span class="Apple-converted-space">        </span>firebase.initializeApp(firebaseConfig);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const auth = firebase.auth();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const db = firebase.firestore();</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// ตรวจสอบความถูกต้องของ API Key เพื่อไม่ให้เกิด Unhandled Error และบล็อกระบบพังทั้งหมด</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let isFirebaseConfigured = firebaseConfig &amp;&amp; firebaseConfig.apiKey &amp;&amp; firebaseConfig.apiKey !== "YOUR_API_KEY_HERE" &amp;&amp; firebaseConfig.apiKey !== "";</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let auth, db, tellersRef, packagesRef, queuesRef;</p>
+<p class="p1"><span class="Apple-converted-space">        </span>let firebaseInitialized = false;</p>
 <p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// Database collection references (Rule 1: Strict Paths)</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const tellersRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('tellers');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const packagesRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('packages');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const queuesRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('queues');</p>
+<p class="p1"><span class="Apple-converted-space">        </span>if (isFirebaseConfigured) {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>try {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>firebase.initializeApp(firebaseConfig);</p>
+<p class="p1"><span class="Apple-converted-space">                </span>auth = firebase.auth();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>db = firebase.firestore();</p>
+<p class="p2"><span class="Apple-converted-space">                </span></p>
+<p class="p1"><span class="Apple-converted-space">                </span>// Database collection references (Rule 1: Strict Paths)</p>
+<p class="p1"><span class="Apple-converted-space">                </span>tellersRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('tellers');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>packagesRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('packages');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>queuesRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('queues');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>firebaseInitialized = true;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>} catch (err) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>console.error("Firebase Initialization Error:", err);</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p1"><span class="Apple-converted-space">        </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>console.warn("Firebase config has placeholders or is missing. Falling back to local offline mode.");</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
 <p class="p2"><br></p>
 <p class="p1"><span class="Apple-converted-space">        </span>// Connection badge state</p>
 <p class="p1"><span class="Apple-converted-space">        </span>function setConnectionStatus(status) {</p>
@@ -844,6 +873,9 @@
 <p class="p1"><span class="Apple-converted-space">            </span>} else if (status === 'connected') {</p>
 <p class="p1"><span class="Apple-converted-space">                </span>badge.className = 'w-2 h-2 rounded-full bg-emerald-500';</p>
 <p class="p1"><span class="Apple-converted-space">                </span>badge.title = 'เชื่อมต่อฐานข้อมูลแบบเรียลไทม์แล้ว 🟢';</p>
+<p class="p1"><span class="Apple-converted-space">            </span>} else if (status === 'offline') {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>badge.className = 'w-2 h-2 rounded-full bg-blue-500';</p>
+<p class="p1"><span class="Apple-converted-space">                </span>badge.title = 'ทำงานในโหมดออฟไลน์จำลอง 🔵 (เก็บข้อมูลใน LocalStorage)';</p>
 <p class="p1"><span class="Apple-converted-space">            </span>} else {</p>
 <p class="p1"><span class="Apple-converted-space">                </span>badge.className = 'w-2 h-2 rounded-full bg-rose-500';</p>
 <p class="p1"><span class="Apple-converted-space">                </span>badge.title = 'การเชื่อมต่อผิดพลาด 🔴';</p>
@@ -852,10 +884,21 @@
 <p class="p2"><br></p>
 <p class="p1"><span class="Apple-converted-space">        </span>// --- APP INITIALIZATION ---</p>
 <p class="p1"><span class="Apple-converted-space">        </span>window.addEventListener('DOMContentLoaded', async () =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>setConnectionStatus('connecting');</p>
 <p class="p1"><span class="Apple-converted-space">            </span>initializeTheme();</p>
 <p class="p1"><span class="Apple-converted-space">            </span>setupEventListeners();</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>loadLocalConfigs();</p>
+<p class="p1"><span class="Apple-converted-space">            </span>syncFormInputsFromDrafts();</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>if (!firebaseInitialized) {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>setConnectionStatus('offline');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>showToast('🔵 ทำงานในโหมดออฟไลน์ (กรุณาตั้งค่า Firebase Config ในโค้ดก่อนใช้งานจริงบน GitHub)', 'error');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>loadLocalFallbackData();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>renderApp();</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
+<p class="p1"><span class="Apple-converted-space">            </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">            </span>setConnectionStatus('connecting');</p>
+<p class="p2"><br></p>
 <p class="p1"><span class="Apple-converted-space">            </span>// Rule 3: Auth Before Queries</p>
 <p class="p1"><span class="Apple-converted-space">            </span>try {</p>
 <p class="p1"><span class="Apple-converted-space">                </span>if (typeof __initial_auth_token !== 'undefined' &amp;&amp; __initial_auth_token) {</p>
@@ -868,10 +911,6 @@
 <p class="p1"><span class="Apple-converted-space">                </span>showToast('🔑 การตรวจสอบสิทธิ์ระบบล้มเหลว', 'error');</p>
 <p class="p1"><span class="Apple-converted-space">                </span>setConnectionStatus('error');</p>
 <p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Sync localStorage configs</p>
-<p class="p1"><span class="Apple-converted-space">            </span>loadLocalConfigs();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>syncFormInputsFromDrafts();</p>
 <p class="p2"><br></p>
 <p class="p1"><span class="Apple-converted-space">            </span>// Setup real-time listener (Rule 3 Guard &amp; Rule 2 Simple collection queries)</p>
 <p class="p1"><span class="Apple-converted-space">            </span>auth.onAuthStateChanged((user) =&gt; {</p>
@@ -960,6 +999,20 @@
 <p class="p1"><span class="Apple-converted-space">                    </span>setConnectionStatus('error');</p>
 <p class="p1"><span class="Apple-converted-space">                </span>}</p>
 <p class="p1"><span class="Apple-converted-space">            </span>);</p>
+<p class="p1"><span class="Apple-converted-space">        </span>}</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// --- LOCAL FALLBACK DATA LOADER ---</p>
+<p class="p1"><span class="Apple-converted-space">        </span>function loadLocalFallbackData() {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>state.tellers = JSON.parse(localStorage.getItem('tarot_tellers')) || [];</p>
+<p class="p1"><span class="Apple-converted-space">            </span>state.packages = JSON.parse(localStorage.getItem('tarot_packages')) || [];</p>
+<p class="p1"><span class="Apple-converted-space">            </span>state.queues = JSON.parse(localStorage.getItem('tarot_queues')) || [];</p>
+<p class="p2"><span class="Apple-converted-space">            </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>// Sort locally in memory (Rule 2)</p>
+<p class="p1"><span class="Apple-converted-space">            </span>state.queues.sort((a, b) =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const dateA = a.createdAt ? new Date(a.createdAt) : 0;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>const dateB = b.createdAt ? new Date(b.createdAt) : 0;</p>
+<p class="p1"><span class="Apple-converted-space">                </span>return dateB - dateA;<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">            </span>});</p>
 <p class="p1"><span class="Apple-converted-space">        </span>}</p>
 <p class="p2"><br></p>
 <p class="p1"><span class="Apple-converted-space">        </span>// --- LOAD CONFIGS ONLY ---</p>
@@ -1083,27 +1136,31 @@
 <p class="p1"><span class="Apple-converted-space">                    </span>'การดำเนินการนี้จะลบข้อมูลคิวงาน, แม่หมอ, และตารางแพ็กเกจทั้งหมดบนเซิร์ฟเวอร์คลาวด์ร่วมกัน รวมถึงแบบร่างอย่างถาวร หน้าจออื่นของผู้ใช้อื่นจะถูกรีเฟรชข้อมูลตามทันที',<span class="Apple-converted-space"> </span></p>
 <p class="p1"><span class="Apple-converted-space">                    </span>async () =&gt; {</p>
 <p class="p1"><span class="Apple-converted-space">                        </span>try {</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>setConnectionStatus('connecting');</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>// Clear state locally</p>
 <p class="p1"><span class="Apple-converted-space">                            </span>localStorage.clear();</p>
-<p class="p2"><span class="Apple-converted-space">                            </span></p>
-<p class="p1"><span class="Apple-converted-space">                            </span>// Delete all documents from firestore collection (Helper loop for prototype clearance)</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>const tellersSnap = await tellersRef.get();</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>const packagesSnap = await packagesRef.get();</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>const queuesSnap = await queuesRef.get();</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>if (firebaseInitialized) {</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>setConnectionStatus('connecting');</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>const tellersSnap = await tellersRef.get();</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>const packagesSnap = await packagesRef.get();</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>const queuesSnap = await queuesRef.get();</p>
 <p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                            </span>const batch = db.batch();</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>tellersSnap.forEach(doc =&gt; batch.delete(doc.ref));</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>packagesSnap.forEach(doc =&gt; batch.delete(doc.ref));</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>queuesSnap.forEach(doc =&gt; batch.delete(doc.ref));</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>const batch = db.batch();</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>tellersSnap.forEach(doc =&gt; batch.delete(doc.ref));</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>packagesSnap.forEach(doc =&gt; batch.delete(doc.ref));</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>queuesSnap.forEach(doc =&gt; batch.delete(doc.ref));</p>
 <p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                            </span>await batch.commit();</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>showToast('🗑️ เคลียร์ฐานข้อมูลทั้งหมดสำเร็จ');</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>await batch.commit();</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>showToast('🗑️ เคลียร์ฐานข้อมูลทั้งหมดสำเร็จ');</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>state.tellers = [];</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>state.packages = [];</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>state.queues = [];</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>showToast('🗑️ เคลียร์ฐานข้อมูลจำลองเครื่องนี้เรียบร้อย');</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>}</p>
 <p class="p1"><span class="Apple-converted-space">                            </span>setTimeout(() =&gt; location.reload(), 1000);</p>
 <p class="p1"><span class="Apple-converted-space">                        </span>} catch (err) {</p>
 <p class="p1"><span class="Apple-converted-space">                            </span>console.error(err);</p>
 <p class="p1"><span class="Apple-converted-space">                            </span>showToast('❌ ไม่สามารถลบฐานข้อมูลได้สำเร็จ', 'error');</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>setConnectionStatus('connected');</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>if (firebaseInitialized) setConnectionStatus('connected');</p>
 <p class="p1"><span class="Apple-converted-space">                        </span>}</p>
 <p class="p1"><span class="Apple-converted-space">                    </span>}</p>
 <p class="p1"><span class="Apple-converted-space">                </span>);</p>
@@ -1322,7 +1379,7 @@
 <p class="p1"><span class="Apple-converted-space">            </span>renderApp();</p>
 <p class="p1"><span class="Apple-converted-space">        </span>}</p>
 <p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// --- SUBMIT HANDLING LOGIC (USING FIRESTORE WRITE ACTIONS) ---</p>
+<p class="p1"><span class="Apple-converted-space">        </span>// --- SUBMIT HANDLING LOGIC (USING FIRESTORE WRITE ACTIONS WITH OFFLINE FALLBACK) ---</p>
 <p class="p1"><span class="Apple-converted-space">        </span>async function handleTellerSubmit(e) {</p>
 <p class="p1"><span class="Apple-converted-space">            </span>e.preventDefault();</p>
 <p class="p2"><span class="Apple-converted-space">            </span></p>
@@ -1365,15 +1422,25 @@
 <p class="p1"><span class="Apple-converted-space">                    </span>avatar: state.tellerForm.avatar || '🔮'</p>
 <p class="p1"><span class="Apple-converted-space">                </span>};</p>
 <p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (state.editingTellerId) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>// Update Document</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>await tellersRef.doc(state.editingTellerId).set(dataPayload, { merge: true });</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>showToast('✅ แก้ไขข้อมูลแม่หมอสำเร็จ');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (firebaseInitialized) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (state.editingTellerId) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>await tellersRef.doc(state.editingTellerId).set(dataPayload, { merge: true });</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>showToast('✅ แก้ไขข้อมูลแม่หมอสำเร็จ');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>const docId = 'teller_' + Date.now();</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>await tellersRef.doc(docId).set(dataPayload);</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>showToast('✅ บันทึกแม่หมอเรียบร้อย');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
 <p class="p1"><span class="Apple-converted-space">                </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>// Add Document</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const docId = 'teller_' + Date.now();</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>await tellersRef.doc(docId).set(dataPayload);</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>showToast('✅ บันทึกแม่หมอเรียบร้อย');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (state.editingTellerId) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>state.tellers = state.tellers.map(t =&gt; t.id === state.editingTellerId ? { ...dataPayload, id: state.editingTellerId } : t);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>const docId = 'teller_' + Date.now();</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>state.tellers.push({ ...dataPayload, id: docId });</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>localStorage.setItem('tarot_tellers', JSON.stringify(state.tellers));</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>showToast('💾 บันทึกข้อมูลแม่หมอในเครื่อง (โหมดออฟไลน์)');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>renderApp();</p>
 <p class="p1"><span class="Apple-converted-space">                </span>}</p>
 <p class="p2"><br></p>
 <p class="p1"><span class="Apple-converted-space">                </span>// Wipe draft on successful submit</p>
@@ -1416,13 +1483,25 @@
 <p class="p1"><span class="Apple-converted-space">                    </span>detail: state.packageForm.detail ? state.packageForm.detail.trim() : ''</p>
 <p class="p1"><span class="Apple-converted-space">                </span>};</p>
 <p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (state.editingPackageId) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>await packagesRef.doc(state.editingPackageId).set(dataPayload, { merge: true });</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>showToast('✅ แก้ไขแพ็กเกจราคาสำเร็จ');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (firebaseInitialized) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (state.editingPackageId) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>await packagesRef.doc(state.editingPackageId).set(dataPayload, { merge: true });</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>showToast('✅ แก้ไขแพ็กเกจราคาสำเร็จ');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>const docId = 'pkg_' + Date.now();</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>await packagesRef.doc(docId).set(dataPayload);</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>showToast('✅ บันทึกแพ็กเกจราคาสำเร็จ');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
 <p class="p1"><span class="Apple-converted-space">                </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const docId = 'pkg_' + Date.now();</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>await packagesRef.doc(docId).set(dataPayload);</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>showToast('✅ บันทึกแพ็กเกจราคาสำเร็จ');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (state.editingPackageId) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>state.packages = state.packages.map(p =&gt; p.id === state.editingPackageId ? { ...dataPayload, id: state.editingPackageId } : p);</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>const docId = 'pkg_' + Date.now();</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>state.packages.push({ ...dataPayload, id: docId });</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>localStorage.setItem('tarot_packages', JSON.stringify(state.packages));</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>showToast('💾 บันทึกแพ็กเกจในเครื่อง (โหมดออฟไลน์)');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>renderApp();</p>
 <p class="p1"><span class="Apple-converted-space">                </span>}</p>
 <p class="p2"><br></p>
 <p class="p1"><span class="Apple-converted-space">                </span>resetPackageFormState();</p>
@@ -1499,13 +1578,26 @@
 <p class="p1"><span class="Apple-converted-space">                        </span>: getThailandLocalDate()</p>
 <p class="p1"><span class="Apple-converted-space">                </span>};</p>
 <p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (state.editingQueueId) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>await queuesRef.doc(state.editingQueueId).set(dataPayload, { merge: true });</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>showToast('✅ แก้ไขบันทึกคิวสำเร็จ');</p>
+<p class="p1"><span class="Apple-converted-space">                </span>if (firebaseInitialized) {</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (state.editingQueueId) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>await queuesRef.doc(state.editingQueueId).set(dataPayload, { merge: true });</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>showToast('✅ แก้ไขบันทึกคิวสำเร็จ');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>const docId = 'queue_' + Date.now();</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>await queuesRef.doc(docId).set(dataPayload);</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>showToast('✅ บันทึกคิวจองสำเร็จเรียบร้อย');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
 <p class="p1"><span class="Apple-converted-space">                </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const docId = 'queue_' + Date.now();</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>await queuesRef.doc(docId).set(dataPayload);</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>showToast('✅ บันทึกคิวจองสำเร็จเรียบร้อย');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (state.editingQueueId) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>state.queues = state.queues.map(q =&gt; q.id === state.editingQueueId ? { ...dataPayload, id: state.editingQueueId } : q);</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>showToast('✅ แก้ไขบันทึกคิวออฟไลน์สำเร็จ');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>const docId = 'queue_' + Date.now();</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>state.queues.unshift({ id: docId, ...dataPayload });</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>showToast('✅ บันทึกคิวจองออฟไลน์สำเร็จ');</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>localStorage.setItem('tarot_queues', JSON.stringify(state.queues));</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>renderApp();</p>
 <p class="p1"><span class="Apple-converted-space">                </span>}</p>
 <p class="p2"><br></p>
 <p class="p1"><span class="Apple-converted-space">                </span>resetQueueFormState();</p>
@@ -1529,6 +1621,7 @@
 <p class="p1"><span class="Apple-converted-space">            </span>syncFormInputsFromDrafts();</p>
 <p class="p1"><span class="Apple-converted-space">        </span>}</p>
 <p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Reset Queue Form</p>
 <p class="p1"><span class="Apple-converted-space">        </span>function resetQueueFormState() {</p>
 <p class="p1"><span class="Apple-converted-space">            </span>const tomorrow = new Date(Date.now() + 86400000);</p>
 <p class="p1"><span class="Apple-converted-space">            </span>state.queueForm = {</p>
@@ -1869,7 +1962,7 @@
 <p class="p1"><span class="Apple-converted-space">                            </span>&lt;div class="mt-4 p-3 rounded-xl bg-purple-50/50 dark:bg-zinc-950 border border-purple-100/20 text-xs"&gt;</p>
 <p class="p1"><span class="Apple-converted-space">                                </span>&lt;p class="font-bold text-purple-700 dark:text-purple-400"&gt;${pkg?.name || 'กำหนดเอง'}&lt;/p&gt;</p>
 <p class="p1"><span class="Apple-converted-space">                                </span>&lt;p class="text-[11px] text-zinc-400 mt-0.5"&gt;ราคา: ${q.totalPrice} บ. (จ่ายแล้ว: ${q.paidAmount} บ.)&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>&lt;p class="text-[11px] text-zinc-500 dark:text-zinc-400 mt-1 italic line-clamp-2"&gt;"${q.questions}"&lt;/p&gt;</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>&lt;p class="text-[11px] text-zinc-505 dark:text-zinc-400 mt-1 italic line-clamp-2"&gt;"${q.questions}"&lt;/p&gt;</p>
 <p class="p1"><span class="Apple-converted-space">                            </span>&lt;/div&gt;</p>
 <p class="p1"><span class="Apple-converted-space">                        </span>&lt;/div&gt;</p>
 <p class="p2"><br></p>
@@ -2194,6 +2287,7 @@
 <p class="p1"><span class="Apple-converted-space">            </span>});</p>
 <p class="p1"><span class="Apple-converted-space">        </span>}</p>
 <p class="p2"><br></p>
+<p class="p1"><span class="Apple-converted-space">        </span>// Urgent alert</p>
 <p class="p1"><span class="Apple-converted-space">        </span>function getUrgentAlerts() {</p>
 <p class="p1"><span class="Apple-converted-space">            </span>const alerts = [];</p>
 <p class="p1"><span class="Apple-converted-space">            </span>const now = new Date();</p>
@@ -2275,9 +2369,15 @@
 <p class="p1"><span class="Apple-converted-space">        </span>}</p>
 <p class="p2"><br></p>
 <p class="p1"><span class="Apple-converted-space">        </span>function deleteTellerById(id) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>openConfirmDialog('⚠️ ยืนยันการลบแม่หมอ?', 'ข้อมูลส่วนตัวของแม่หมอคนนี้จะถูกลบออกจากฐานข้อมูลเซิร์ฟเวอร์แบบเรียลไทม์ทันที', async () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>openConfirmDialog('⚠️ ยืนยันการลบแม่หมอ?', 'ข้อมูลส่วนตัวของแม่หมอคนนี้จะถูกลบออกจากฐานข้อมูลระบบทันที', async () =&gt; {</p>
 <p class="p1"><span class="Apple-converted-space">                </span>try {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>await tellersRef.doc(id).delete();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (firebaseInitialized) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>await tellersRef.doc(id).delete();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>state.tellers = state.tellers.filter(t =&gt; t.id !== id);</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>localStorage.setItem('tarot_tellers', JSON.stringify(state.tellers));</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>renderApp();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
 <p class="p1"><span class="Apple-converted-space">                    </span>showToast('🗑️ ลบแม่หมอเรียบร้อย');</p>
 <p class="p1"><span class="Apple-converted-space">                </span>} catch (err) {</p>
 <p class="p1"><span class="Apple-converted-space">                    </span>console.error(err);</p>
@@ -2312,7 +2412,13 @@
 <p class="p1"><span class="Apple-converted-space">        </span>function deletePackageById(id) {</p>
 <p class="p1"><span class="Apple-converted-space">            </span>openConfirmDialog('⚠️ ยืนยันการลบแพ็กเกจ?', 'ราคาและสิทธิประโยชน์ของแพ็กเกจนี้จะถูกนำออกไป คุณต้องการลบจริงหรือไม่', async () =&gt; {</p>
 <p class="p1"><span class="Apple-converted-space">                </span>try {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>await packagesRef.doc(id).delete();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (firebaseInitialized) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>await packagesRef.doc(id).delete();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>state.packages = state.packages.filter(p =&gt; p.id !== id);</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>localStorage.setItem('tarot_packages', JSON.stringify(state.packages));</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>renderApp();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
 <p class="p1"><span class="Apple-converted-space">                    </span>showToast('🗑️ ลบแพ็กเกจราคาเรียบร้อย');</p>
 <p class="p1"><span class="Apple-converted-space">                </span>} catch (err) {</p>
 <p class="p1"><span class="Apple-converted-space">                    </span>console.error(err);</p>
@@ -2385,9 +2491,15 @@
 <p class="p1"><span class="Apple-converted-space">        </span>}</p>
 <p class="p2"><br></p>
 <p class="p1"><span class="Apple-converted-space">        </span>function deleteQueueById(id) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>openConfirmDialog('⚠️ คุณต้องการลบคิวนี้หรือไม่?', 'รายละเอียดคิวและคำถามทั้งหมดจะถูกลบออกจากคลาวด์และหายไปทันที', async () =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">            </span>openConfirmDialog('⚠️ คุณต้องการลบคิวนี้หรือไม่?', 'รายละเอียดคิวและคำถามทั้งหมดจะถูกลบออกจากระบบและหายไปทันที', async () =&gt; {</p>
 <p class="p1"><span class="Apple-converted-space">                </span>try {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>await queuesRef.doc(id).delete();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>if (firebaseInitialized) {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>await queuesRef.doc(id).delete();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>state.queues = state.queues.filter(q =&gt; q.id !== id);</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>localStorage.setItem('tarot_queues', JSON.stringify(state.queues));</p>
+<p class="p1"><span class="Apple-converted-space">                        </span>renderApp();</p>
+<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
 <p class="p1"><span class="Apple-converted-space">                    </span>showToast('🗑️ ลบคิวลูกดวงเรียบร้อย');</p>
 <p class="p1"><span class="Apple-converted-space">                </span>} catch (err) {</p>
 <p class="p1"><span class="Apple-converted-space">                    </span>console.error(err);</p>
@@ -2457,18 +2569,23 @@
 <p class="p1"><span class="Apple-converted-space">            </span>document.getElementById('detail-cust-delete-btn').onclick = () =&gt; {</p>
 <p class="p1"><span class="Apple-converted-space">                </span>openConfirmDialog(</p>
 <p class="p1"><span class="Apple-converted-space">                    </span>'🗑️ ยืนยันลบประวัติลูกดวงทั้งหมด?',<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>`ประวัติคิว และคำถามทั้งหมดของคุณ ${found.nickname} จะถูกลบออกอย่างถาวรจากฐานข้อมูลคลาวด์`,<span class="Apple-converted-space"> </span></p>
+<p class="p1"><span class="Apple-converted-space">                    </span>`ประวัติคิว และคำถามทั้งหมดของคุณ ${found.nickname} จะถูกลบออกอย่างถาวรจากฐานข้อมูล`,<span class="Apple-converted-space"> </span></p>
 <p class="p1"><span class="Apple-converted-space">                    </span>async () =&gt; {</p>
 <p class="p1"><span class="Apple-converted-space">                        </span>try {</p>
 <p class="p1"><span class="Apple-converted-space">                            </span>const targetName = found.fullname || found.nickname;</p>
 <p class="p1"><span class="Apple-converted-space">                            </span>const deleteTargets = state.queues.filter(item =&gt; (item.fullname || item.nickname) === targetName);</p>
 <p class="p2"><span class="Apple-converted-space">                            </span></p>
-<p class="p1"><span class="Apple-converted-space">                            </span>const batch = db.batch();</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>deleteTargets.forEach(q =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>batch.delete(queuesRef.doc(q.id));</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>});</p>
-<p class="p2"><span class="Apple-converted-space">                            </span></p>
-<p class="p1"><span class="Apple-converted-space">                            </span>await batch.commit();</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>if (firebaseInitialized) {</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>const batch = db.batch();</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>deleteTargets.forEach(q =&gt; {</p>
+<p class="p1"><span class="Apple-converted-space">                                    </span>batch.delete(queuesRef.doc(q.id));</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>});</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>await batch.commit();</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>} else {</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>state.queues = state.queues.filter(item =&gt; (item.fullname || item.nickname) !== targetName);</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>localStorage.setItem('tarot_queues', JSON.stringify(state.queues));</p>
+<p class="p1"><span class="Apple-converted-space">                                </span>renderApp();</p>
+<p class="p1"><span class="Apple-converted-space">                            </span>}</p>
 <p class="p1"><span class="Apple-converted-space">                            </span>showToast('🗑️ ลบประวัติคิวลูกดวงสำเร็จ');</p>
 <p class="p1"><span class="Apple-converted-space">                            </span>closeCustomerDetailModal();</p>
 <p class="p1"><span class="Apple-converted-space">                        </span>} catch (err) {</p>
