@@ -885,7 +885,25 @@
 
             setConnectionStatus('connecting');
 
-            // Rule 3: Auth Before Queries
+            // Rule 3: Auth Before Queries Guard setup
+            let unsubscribeSnapshotListeners = null;
+            auth.onAuthStateChanged((user) => {
+                if (user) {
+                    // Start realtime snapshot listener only after successful auth session propagation
+                    if (!unsubscribeSnapshotListeners) {
+                        unsubscribeSnapshotListeners = setupRealtimeDatabaseListeners();
+                    }
+                } else {
+                    // Reset listeners if signed out
+                    if (unsubscribeSnapshotListeners) {
+                        unsubscribeSnapshotListeners();
+                        unsubscribeSnapshotListeners = null;
+                    }
+                    setConnectionStatus('connecting');
+                }
+            });
+
+            // Trigger actual authentication async process (awaiting it first)
             try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await auth.signInWithCustomToken(__initial_auth_token);
@@ -897,19 +915,13 @@
                 showToast('🔑 การตรวจสอบสิทธิ์ระบบล้มเหลว', 'error');
                 setConnectionStatus('error');
             }
-
-            // Setup real-time listener (Rule 3 Guard & Rule 2 Simple collection queries)
-            auth.onAuthStateChanged((user) => {
-                if (user) {
-                    setupRealtimeDatabaseListeners();
-                } else {
-                    showToast('🔒 กรุณารอเชื่อมต่อสิทธิ์ความปลอดภัย', 'error');
-                }
-            });
         });
 
         // --- REALTIME SYNC LISTENERS (FIRESTORE TO CLIENT) ---
         function setupRealtimeDatabaseListeners() {
+            // Rule 3: Guard every Firestore operation
+            if (!auth.currentUser) return null;
+
             let activeListeners = 0;
             const checkConnected = () => {
                 activeListeners++;
@@ -919,7 +931,7 @@
             };
 
             // 1. Tellers list sync
-            tellersRef.onSnapshot(
+            const unsubTellers = tellersRef.onSnapshot(
                 (snapshot) => {
                     state.tellers = [];
                     snapshot.forEach(doc => {
@@ -939,13 +951,13 @@
                 },
                 (error) => {
                     console.error("Tellers Sync Error: ", error);
-                    showToast('❌ ไม่สามารถดึงข้อมูลแม่หมอได้', 'error');
+                    showToast('❌ ไม่สามารถดึงข้อมูลแม่หมอได้ (สิทธิ์ไม่เพียงพอ)', 'error');
                     setConnectionStatus('error');
                 }
             );
 
             // 2. Packages list sync
-            packagesRef.onSnapshot(
+            const unsubPackages = packagesRef.onSnapshot(
                 (snapshot) => {
                     state.packages = [];
                     snapshot.forEach(doc => {
@@ -956,13 +968,13 @@
                 },
                 (error) => {
                     console.error("Packages Sync Error: ", error);
-                    showToast('❌ ไม่สามารถดึงตารางราคาแพ็กเกจได้', 'error');
+                    showToast('❌ ไม่สามารถดึงตารางราคาแพ็กเกจได้ (สิทธิ์ไม่เพียงพอ)', 'error');
                     setConnectionStatus('error');
                 }
             );
 
             // 3. Queues list sync
-            queuesRef.onSnapshot(
+            const unsubQueues = queuesRef.onSnapshot(
                 (snapshot) => {
                     state.queues = [];
                     snapshot.forEach(doc => {
@@ -981,10 +993,17 @@
                 },
                 (error) => {
                     console.error("Queues Sync Error: ", error);
-                    showToast('❌ ไม่สามารถเชื่อมต่อตารางคิวงานได้', 'error');
+                    showToast('❌ ไม่สามารถเชื่อมต่อตารางคิวงานได้ (สิทธิ์ไม่เพียงพอ)', 'error');
                     setConnectionStatus('error');
                 }
             );
+
+            // Return unsubscribe cleanup function wrapper
+            return () => {
+                unsubTellers();
+                unsubPackages();
+                unsubQueues();
+            };
         }
 
         // --- LOCAL FALLBACK DATA LOADER ---
@@ -1123,7 +1142,8 @@
                     async () => {
                         try {
                             localStorage.clear();
-                            if (firebaseInitialized) {
+                            // Rule 3: Guard Firestore Operations
+                            if (firebaseInitialized && auth.currentUser) {
                                 setConnectionStatus('connecting');
                                 const tellersSnap = await tellersRef.get();
                                 const packagesSnap = await packagesRef.get();
@@ -1146,7 +1166,7 @@
                         } catch (err) {
                             console.error(err);
                             showToast('❌ ไม่สามารถลบฐานข้อมูลได้สำเร็จ', 'error');
-                            if (firebaseInitialized) setConnectionStatus('connected');
+                            if (firebaseInitialized && auth.currentUser) setConnectionStatus('connected');
                         }
                     }
                 );
@@ -1408,7 +1428,8 @@
                     avatar: state.tellerForm.avatar || '🔮'
                 };
 
-                if (firebaseInitialized) {
+                // Rule 3: Guard Firestore Operation with active Auth session check
+                if (firebaseInitialized && auth.currentUser) {
                     if (state.editingTellerId) {
                         await tellersRef.doc(state.editingTellerId).set(dataPayload, { merge: true });
                         showToast('✅ แก้ไขข้อมูลแม่หมอสำเร็จ');
@@ -1469,7 +1490,8 @@
                     detail: state.packageForm.detail ? state.packageForm.detail.trim() : ''
                 };
 
-                if (firebaseInitialized) {
+                // Rule 3: Guard Firestore Operation with active Auth session check
+                if (firebaseInitialized && auth.currentUser) {
                     if (state.editingPackageId) {
                         await packagesRef.doc(state.editingPackageId).set(dataPayload, { merge: true });
                         showToast('✅ แก้ไขแพ็กเกจราคาสำเร็จ');
@@ -1564,7 +1586,8 @@
                         : getThailandLocalDate()
                 };
 
-                if (firebaseInitialized) {
+                // Rule 3: Guard Firestore Operation with active Auth session check
+                if (firebaseInitialized && auth.currentUser) {
                     if (state.editingQueueId) {
                         await queuesRef.doc(state.editingQueueId).set(dataPayload, { merge: true });
                         showToast('✅ แก้ไขบันทึกคิวสำเร็จ');
@@ -2358,7 +2381,8 @@
         function deleteTellerById(id) {
             openConfirmDialog('⚠️ ยืนยันการลบแม่หมอ?', 'ข้อมูลส่วนตัวของแม่หมอคนนี้จะถูกลบออกจากฐานข้อมูลระบบทันที', async () => {
                 try {
-                    if (firebaseInitialized) {
+                    // Rule 3: Guard Firestore Operation
+                    if (firebaseInitialized && auth.currentUser) {
                         await tellersRef.doc(id).delete();
                     } else {
                         state.tellers = state.tellers.filter(t => t.id !== id);
@@ -2400,7 +2424,8 @@
         function deletePackageById(id) {
             openConfirmDialog('⚠️ ยืนยันการลบแพ็กเกจ?', 'ราคาและสิทธิประโยชน์ของแพ็กเกจนี้จะถูกนำออกไป คุณต้องการลบจริงหรือไม่', async () => {
                 try {
-                    if (firebaseInitialized) {
+                    // Rule 3: Guard Firestore Operation
+                    if (firebaseInitialized && auth.currentUser) {
                         await packagesRef.doc(id).delete();
                     } else {
                         state.packages = state.packages.filter(p => p.id !== id);
@@ -2481,7 +2506,8 @@
         function deleteQueueById(id) {
             openConfirmDialog('⚠️ คุณต้องการลบคิวนี้หรือไม่?', 'รายละเอียดคิวและคำถามทั้งหมดจะถูกลบออกจากระบบและหายไปทันที', async () => {
                 try {
-                    if (firebaseInitialized) {
+                    // Rule 3: Guard Firestore Operation
+                    if (firebaseInitialized && auth.currentUser) {
                         await queuesRef.doc(id).delete();
                     } else {
                         state.queues = state.queues.filter(q => q.id !== id);
@@ -2563,7 +2589,8 @@
                             const targetName = found.fullname || found.nickname;
                             const deleteTargets = state.queues.filter(item => (item.fullname || item.nickname) === targetName);
                             
-                            if (firebaseInitialized) {
+                            // Rule 3: Guard Firestore Operation
+                            if (firebaseInitialized && auth.currentUser) {
                                 const batch = db.batch();
                                 deleteTargets.forEach(q => {
                                     batch.delete(queuesRef.doc(q.id));
@@ -2587,6 +2614,7 @@
             document.getElementById('modal-customer-detail').classList.remove('hidden');
         }
 
+        // Close Modal
         function closeCustomerDetailModal() {
             document.getElementById('modal-customer-detail').classList.add('hidden');
             state.selectedQueueIdForDetail = null;
