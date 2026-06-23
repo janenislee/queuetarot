@@ -42,7 +42,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+Thai:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-    <!-- Firebase Client SDKs -->
+    <!-- Firebase Client SDKs (Compat version for stable scripting) -->
     <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
@@ -628,7 +628,7 @@
                             <input id="queue-input-total-price" type="number" class="w-full p-2 rounded-lg border border-zinc-200 dark:border-zinc-800 font-bold text-purple-600 dark:text-purple-400 bg-white dark:bg-zinc-900 focus:outline-none" />
                         </div>
                         <div>
-                            <span class="font-bold text-zinc-500 dark:text-zinc-400 block mb-1">สถานะชำระเงิน *</span>
+                            <span class="font-bold text-zinc-500 dark:text-zinc-400 block mb-1">สถานะชำเงิน *</span>
                             <select id="queue-input-payment-status" class="w-full p-2 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-800 dark:text-white focus:outline-none">
                                 <option value="ยังไม่ชำระ">ยังไม่ชำระ</option>
                                 <option value="มัดจำแล้ว">มัดจำแล้ว</option>
@@ -1601,6 +1601,7 @@
             syncFormInputsFromDrafts();
         }
 
+        // Reset Package Form State
         function resetPackageFormState() {
             state.packageForm = { id: '', name: '', type: 'ถามเฉพาะเรื่อง', price: '', detail: '' };
             localStorage.removeItem('tarot_package_form_draft');
@@ -2395,6 +2396,7 @@
             state.editingPackageId = null;
         }
 
+        // Delete package
         function deletePackageById(id) {
             openConfirmDialog('⚠️ ยืนยันการลบแพ็กเกจ?', 'ราคาและสิทธิประโยชน์ของแพ็กเกจนี้จะถูกนำออกไป คุณต้องการลบจริงหรือไม่', async () => {
                 try {
